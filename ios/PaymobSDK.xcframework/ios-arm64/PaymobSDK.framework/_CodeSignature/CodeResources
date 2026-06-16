@@ -14,7 +14,7 @@
 		</data>
 		<key>AddBankCard.storyboardc/c83-wc-yzt-view-Bjy-zi-dxz.nib</key>
 		<data>
-		0y9b5TkKdV7w56giH8Vm9Llk684=
+		yt1NDClQENtz/ZssfqsgtzXRqCs=
 		</data>
 		<key>AddBankCardCell.nib/objects-14.0+.nib</key>
 		<data>
@@ -66,7 +66,7 @@
 		</data>
 		<key>Assets.car</key>
 		<data>
-		+Y77s6BU7l1NDYAAhAxtjINHRMY=
+		RWpfxvDk5/nv2/cwOSwjzjuqt6g=
 		</data>
 		<key>BKMoneyKit.bundle/CardLogo/amex@2x.png</key>
 		<data>
@@ -122,11 +122,11 @@
 		</data>
 		<key>BankCardList.storyboardc/Y6W-OH-hqX-view-5EZ-qb-Rvc.nib</key>
 		<data>
-		WzkhHW5sgswMUN9oQSh+ntl9IlY=
+		5HmViBqa6J1vaYIa0RKQyP0GjcM=
 		</data>
 		<key>BankCardsView.nib</key>
 		<data>
-		RteF74qQ1KYb8hTKpQcqYKI571g=
+		dxw6w6IftVpdiJERoGNuqx4le1U=
 		</data>
 		<key>BankInstallments.storyboardc/BankInstallmentsVC.nib</key>
 		<data>
@@ -342,7 +342,7 @@
 		</data>
 		<key>Modules/PaymobSDK.swiftmodule/arm64-apple-ios.abi.json</key>
 		<data>
-		CPj/Vwsg7YC+HMcZhS7fOI18OFM=
+		OQP7B7OM8EgIkxA1J6r9KeylgZk=
 		</data>
 		<key>Modules/PaymobSDK.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
 		<data>
@@ -358,7 +358,7 @@
 		</data>
 		<key>Modules/PaymobSDK.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<data>
-		kcLtYERSZAcnDEQ7wTxuWX53Bm4=
+		ZN+h/oGg6PPssnm4P45Jivk3m40=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -534,7 +534,7 @@
 		</data>
 		<key>Tabby.storyboardc/Y6W-OH-hqX-view-5EZ-qb-Rvc.nib</key>
 		<data>
-		cF/WM1KUtP0jm77jUsFNCoviOiA=
+		+IA8QznmFI/exCrFVQaTEKWFE+8=
 		</data>
 		<key>Tamara.storyboardc/Info.plist</key>
 		<data>
@@ -546,7 +546,7 @@
 		</data>
 		<key>Tamara.storyboardc/wIN-dk-JK4-view-r77-qd-pDB.nib</key>
 		<data>
-		x6r0Bn2FsEiNwwt/34Z/j7S4GLw=
+		SQRQn0hmKH6x4/H2c84TSZq3euY=
 		</data>
 		<key>TopBarView.nib</key>
 		<data>
@@ -590,7 +590,7 @@
 		</data>
 		<key>Wallet.storyboardc/Y6W-OH-hqX-view-5EZ-qb-Rvc.nib</key>
 		<data>
-		oarX76FUKd6BbN2Y9PoFu/p6c0w=
+		DPJigPr+0oUhK8TKeHZL6v8nIrM=
 		</data>
 		<key>WebViewVC.nib</key>
 		<data>
@@ -621,7 +621,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			kEjMfr5y5YsB9q6iCtJ08spaJ8zlldj1UTCCrrpsBUA=
+			g/+YSZ+9PN3XfkKuyWv6Tuddc4GY1t9pn6sgKc0MZqc=
 			</data>
 		</dict>
 		<key>AddBankCardCell.nib/objects-14.0+.nib</key>
@@ -712,7 +712,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			6XKQ1uVvADzt6ndRQW+pG13HX5E34maXpQG52IwTBbE=
+			wAQrMXkXDL/3IrqDh7Ryh4t//pncFWdBVRrw6sWZMEs=
 			</data>
 		</dict>
 		<key>BKMoneyKit.bundle/CardLogo/amex@2x.png</key>
@@ -810,14 +810,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			M7nBtR3jqpzYcabr6eUiWUpSv69oDolQYmkP98wJ+EE=
+			f1I297YmORsbCC/VufdfKCQbkXsOnf8SGYH/V0yOW4s=
 			</data>
 		</dict>
 		<key>BankCardsView.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			MR0bcVeogT9lRJb/6p/lk2jdWjr6iDGnQHWBT7IsaDI=
+			/3yLmdP8gcb05i3ER7QuK+Yy/plZ0Td5xaDCWsdN93U=
 			</data>
 		</dict>
 		<key>BankInstallments.storyboardc/BankInstallmentsVC.nib</key>
@@ -1188,7 +1188,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			HJKlqgdsRz8Ad//lvw71ouImQmP29JuzbJ0rf4ByRFY=
+			EDnFU2ILmG5pCxc8xEkJd0siJYUMEBno+crvTGo5VFA=
 			</data>
 		</dict>
 		<key>Modules/PaymobSDK.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
@@ -1216,7 +1216,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			iIKBMkBgJLgr3QZjGnP+BdsxCWBawnisUY2Zvr6ccQo=
+			dXUMppSfQhZCAlRNj1LQFuSVg6ftNLoqvESz8kLWtC0=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
@@ -1524,7 +1524,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			eACef4D9AnKGmHW49VE+7S4MJ8J9AmRO1i/ooF6FQSc=
+			Th1fbk0viKvxnMou/PMv1opI4jS4J1cZWgqY6HBAShY=
 			</data>
 		</dict>
 		<key>Tamara.storyboardc/Info.plist</key>
@@ -1545,7 +1545,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			e/5clJetxKpq343vS2yXXWnIVeEAVuBohVhAPFVF99g=
+			ShwYTZrF2ErrzGs8UeSBT6yji56B9RGXtYDN7shYUgI=
 			</data>
 		</dict>
 		<key>TopBarView.nib</key>
@@ -1622,7 +1622,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			mBeutc6+43GL/h7bHd50Rp4D2ckQxa+Ngq83Z8SRzUU=
+			2P9Zfn7db4Cx8X3HXB3m6RdJFqbCFC6ViTJWf8ZG2s0=
 			</data>
 		</dict>
 		<key>WebViewVC.nib</key>

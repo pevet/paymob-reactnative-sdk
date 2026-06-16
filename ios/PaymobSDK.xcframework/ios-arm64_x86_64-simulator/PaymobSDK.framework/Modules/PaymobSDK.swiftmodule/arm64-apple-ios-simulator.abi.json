@@ -1653,6 +1653,16 @@
       },
       {
         "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
         "name": "Alamofire",
         "printedName": "Alamofire",
         "declKind": "Import",
@@ -2287,6 +2297,16 @@
       },
       {
         "kind": "Import",
+        "name": "RxRelay",
+        "printedName": "RxRelay",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "ImplementationOnly"
+        ]
+      },
+      {
+        "kind": "Import",
         "name": "UIKit",
         "printedName": "UIKit",
         "declKind": "Import",
@@ -2549,6 +2569,16 @@
       },
       {
         "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
         "name": "UIKit",
         "printedName": "UIKit",
         "declKind": "Import",
@@ -2593,6 +2623,16 @@
         "printedName": "UIKit",
         "declKind": "Import",
         "moduleName": "PaymobSDK"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "RawDocComment"
+        ]
       },
       {
         "kind": "Import",
@@ -6402,6 +6442,16 @@
         "moduleName": "PaymobSDK",
         "declAttributes": [
           "ImplementationOnly"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "RawDocComment"
         ]
       },
       {
@@ -10338,6 +10388,16 @@
       },
       {
         "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
         "name": "UIKit",
         "printedName": "UIKit",
         "declKind": "Import",
@@ -12483,6 +12543,16 @@
       },
       {
         "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
         "name": "UIKit",
         "printedName": "UIKit",
         "declKind": "Import",
@@ -13744,6 +13814,16 @@
         "moduleName": "PaymobSDK",
         "declAttributes": [
           "ImplementationOnly"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "RawDocComment"
         ]
       },
       {
@@ -16937,6 +17017,16 @@
         "moduleName": "PaymobSDK",
         "declAttributes": [
           "ImplementationOnly"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "RawDocComment"
         ]
       },
       {
@@ -33701,6 +33791,36 @@
       },
       {
         "kind": "Import",
+        "name": "RxSwift",
+        "printedName": "RxSwift",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "ImplementationOnly"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "RxRelay",
+        "printedName": "RxRelay",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "ImplementationOnly"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
         "name": "Foundation",
         "printedName": "Foundation",
         "declKind": "Import",
@@ -45007,6 +45127,16 @@
       },
       {
         "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "PaymobSDK",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
         "name": "CoreImage",
         "printedName": "CoreImage",
         "declKind": "Import",
@@ -47410,7 +47540,7 @@
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/BaseObjects\/PaymobSDKViewController.swift",
       "kind": "BooleanLiteral",
-      "offset": 1141,
+      "offset": 1874,
       "length": 5,
       "value": "false"
     },
@@ -47420,6 +47550,27 @@
       "offset": 206,
       "length": 18,
       "value": "\"placeholder_name\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesRequestModel.swift",
+      "kind": "StringLiteral",
+      "offset": 342,
+      "length": 15,
+      "value": "\"payment_token\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesRequestModel.swift",
+      "kind": "StringLiteral",
+      "offset": 381,
+      "length": 10,
+      "value": "\"card_bin\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesRequestModel.swift",
+      "kind": "StringLiteral",
+      "offset": 417,
+      "length": 12,
+      "value": "\"card_token\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/Contact\/Model\/ContactInstallmentResponseModel.swift",
@@ -47487,7 +47638,7 @@
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/AddBankCard\/AddBankCardVC.swift",
       "kind": "BooleanLiteral",
-      "offset": 1429,
+      "offset": 1822,
       "length": 5,
       "value": "false"
     },
@@ -47998,28 +48149,28 @@
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Networking\/APIClient.swift",
       "kind": "BooleanLiteral",
-      "offset": 11032,
+      "offset": 11142,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/BankCardList\/BankCardListVC.swift",
       "kind": "BooleanLiteral",
-      "offset": 630,
+      "offset": 1023,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/BankCardList\/BankCardListVC.swift",
       "kind": "BooleanLiteral",
-      "offset": 2404,
+      "offset": 2985,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/BankCardList\/BankCardListVC.swift",
       "kind": "BooleanLiteral",
-      "offset": 2431,
+      "offset": 3012,
       "length": 5,
       "value": "false"
     },
@@ -48033,7 +48184,7 @@
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/BaseObjects\/ContentSizedTableView.swift",
       "kind": "IntegerLiteral",
-      "offset": 451,
+      "offset": 553,
       "length": 1,
       "value": "0"
     },
@@ -48078,6 +48229,41 @@
       "offset": 1087,
       "length": 1,
       "value": "3"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/AddBankCard\/CardDiscountAndConvFeesManager\/PaymentDetails.swift",
+      "kind": "IntegerLiteral",
+      "offset": 190,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/AddBankCard\/CardDiscountAndConvFeesManager\/PaymentDetails.swift",
+      "kind": "IntegerLiteral",
+      "offset": 222,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/AddBankCard\/CardDiscountAndConvFeesManager\/PaymentDetails.swift",
+      "kind": "BooleanLiteral",
+      "offset": 248,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/AddBankCard\/CardDiscountAndConvFeesManager\/PaymentDetails.swift",
+      "kind": "BooleanLiteral",
+      "offset": 282,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/AddBankCard\/CardDiscountAndConvFeesManager\/PaymentDetails.swift",
+      "kind": "IntegerLiteral",
+      "offset": 315,
+      "length": 1,
+      "value": "0"
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/Mogo\/Models\/MogoInstallmentResponseModel.swift",
@@ -48197,6 +48383,55 @@
       "offset": 382,
       "length": 14,
       "value": "\"redirect_url\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Discount\/CardDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 487,
+      "length": 23,
+      "value": "\"amount_cents_with_caf\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Discount\/CardDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 552,
+      "length": 11,
+      "value": "\"caf_fixed\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Discount\/CardDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 588,
+      "length": 11,
+      "value": "\"caf_ratio\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Discount\/CardDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 635,
+      "length": 23,
+      "value": "\"discount_amount_cents\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Discount\/CardDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 688,
+      "length": 16,
+      "value": "\"discount_ratio\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Discount\/CardDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 742,
+      "length": 25,
+      "value": "\"discounted_amount_cents\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Discount\/CardDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 824,
+      "length": 23,
+      "value": "\"original_amount_cents\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/SymplCard\/Model\/SymplRequestModel.swift",
@@ -48486,6 +48721,13 @@
       "value": "\"payment_token\""
     },
     {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Discount\/CardDiscountRequestModel.swift",
+      "kind": "StringLiteral",
+      "offset": 303,
+      "length": 15,
+      "value": "\"payment_token\""
+    },
+    {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Extensions\/StringExtension.swift",
       "kind": "IntegerLiteral",
       "offset": 979,
@@ -48652,6 +48894,90 @@
       "offset": 821,
       "length": 4,
       "value": "true"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1174,
+      "length": 10,
+      "value": "\"card_bin\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1212,
+      "length": 14,
+      "value": "\"amount_cents\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1257,
+      "length": 18,
+      "value": "\"total_fees_cents\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1306,
+      "length": 18,
+      "value": "\"new_amount_cents\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1358,
+      "length": 21,
+      "value": "\"has_applicable_fees\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1436,
+      "length": 23,
+      "value": "\"updated_payment_token\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1484,
+      "length": 11,
+      "value": "\"fee_cases\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1688,
+      "length": 18,
+      "value": "\"total_fees_cents\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1733,
+      "length": 13,
+      "value": "\"fee_details\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1957,
+      "length": 8,
+      "value": "\"fee_id\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 1996,
+      "length": 17,
+      "value": "\"percent_portion\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/Card Fees\/LookupCardFeesResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 2042,
+      "length": 15,
+      "value": "\"fixed_portion\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/BaseObjects\/Otp View\/Controller\/OtpViewVC.swift",
@@ -49125,7 +49451,7 @@
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/Wallet\/WalletVC.swift",
       "kind": "BooleanLiteral",
-      "offset": 588,
+      "offset": 583,
       "length": 5,
       "value": "false"
     },
@@ -49219,6 +49545,34 @@
       "offset": 757,
       "length": 5,
       "value": "false"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/Wallet\/Model\/WalletDiscount\/WalletDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 423,
+      "length": 23,
+      "value": "\"original_amount_cents\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/Wallet\/Model\/WalletDiscount\/WalletDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 482,
+      "length": 23,
+      "value": "\"discount_amount_cents\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/Wallet\/Model\/WalletDiscount\/WalletDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 535,
+      "length": 16,
+      "value": "\"discount_ratio\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/Wallet\/Model\/WalletDiscount\/WalletDiscountResponseModel.swift",
+      "kind": "StringLiteral",
+      "offset": 589,
+      "length": 25,
+      "value": "\"discounted_amount_cents\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/Contact\/ContactInstallments\/ContactInstallmentsViewModel.swift",
@@ -49653,6 +50007,34 @@
       "offset": 359,
       "length": 1,
       "value": "2"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Helpers\/PaymobKeyboard.swift",
+      "kind": "Array",
+      "offset": 648,
+      "length": 2,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Helpers\/PaymobKeyboard.swift",
+      "kind": "BooleanLiteral",
+      "offset": 685,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Helpers\/PaymobKeyboard.swift",
+      "kind": "IntegerLiteral",
+      "offset": 737,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Helpers\/PaymobKeyboard.swift",
+      "kind": "BooleanLiteral",
+      "offset": 771,
+      "length": 5,
+      "value": "false"
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Helpers\/DPOTPView.swift",
@@ -50535,6 +50917,13 @@
       "offset": 702,
       "length": 15,
       "value": "\"mobile_number\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/OTP\/OtpViewModel.swift",
+      "kind": "StringLiteral",
+      "offset": 568,
+      "length": 2,
+      "value": "\"\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Helpers\/FlagPhoneNumber\/Helpers\/FPNOBJCCountryKey.swift",
@@ -54074,14 +54463,14 @@
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/AddBankCard\/AddBankCardViewModel.swift",
       "kind": "BooleanLiteral",
-      "offset": 622,
+      "offset": 874,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Embeddables\/BankCardsTableView\/BankCardsView.swift",
       "kind": "StringLiteral",
-      "offset": 871,
+      "offset": 927,
       "length": 2,
       "value": "\"\""
     },
@@ -56712,260 +57101,267 @@
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
+      "kind": "BooleanLiteral",
+      "offset": 880,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2695,
+      "offset": 3021,
       "length": 6,
       "value": "\"Card\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2730,
+      "offset": 3056,
       "length": 18,
       "value": "\"Card-Installment\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2767,
+      "offset": 3093,
       "length": 8,
       "value": "\"Wallet\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2795,
+      "offset": 3121,
       "length": 10,
       "value": "\"E-Wallet\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2822,
+      "offset": 3148,
       "length": 6,
       "value": "\"ValU\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2846,
+      "offset": 3172,
       "length": 7,
       "value": "\"Forsa\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2873,
+      "offset": 3199,
       "length": 9,
       "value": "\"Premium\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2903,
+      "offset": 3229,
       "length": 10,
       "value": "\"Premium6\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2934,
+      "offset": 3260,
       "length": 10,
       "value": "\"Souhoola\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2967,
+      "offset": 3293,
       "length": 12,
       "value": "\"Souhoolav3\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 2997,
+      "offset": 3323,
       "length": 7,
       "value": "\"Sympl\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3024,
+      "offset": 3350,
       "length": 9,
       "value": "\"Symplv2\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3051,
+      "offset": 3377,
       "length": 7,
       "value": "\"Tabby\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3078,
+      "offset": 3404,
       "length": 9,
       "value": "\"Postpay\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3108,
+      "offset": 3434,
       "length": 11,
       "value": "\"Apple-Pay\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3140,
+      "offset": 3466,
       "length": 10,
       "value": "\"Jazzcash\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3167,
+      "offset": 3493,
       "length": 6,
       "value": "\"Nift\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3195,
+      "offset": 3521,
       "length": 11,
       "value": "\"Easypaisa\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3224,
+      "offset": 3550,
       "length": 7,
       "value": "\"Halan\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3248,
+      "offset": 3574,
       "length": 6,
       "value": "\"Aman\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3273,
+      "offset": 3599,
       "length": 9,
       "value": "\"aman_v3\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3300,
+      "offset": 3626,
       "length": 8,
       "value": "\"Tamara\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3329,
+      "offset": 3655,
       "length": 10,
       "value": "\"Instapay\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3364,
+      "offset": 3690,
       "length": 13,
       "value": "\"Mid-Takseet\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3397,
+      "offset": 3723,
       "length": 9,
       "value": "\"Contact\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3495,
+      "offset": 3821,
       "length": 5,
       "value": "\"egy\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3516,
+      "offset": 3842,
       "length": 5,
       "value": "\"pak\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3537,
+      "offset": 3863,
       "length": 5,
       "value": "\"are\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3558,
+      "offset": 3884,
       "length": 5,
       "value": "\"omn\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3579,
+      "offset": 3905,
       "length": 5,
       "value": "\"sau\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3600,
+      "offset": 3926,
       "length": 5,
       "value": "\"jod\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3698,
+      "offset": 4024,
       "length": 4,
       "value": "\"EG\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3718,
+      "offset": 4044,
       "length": 4,
       "value": "\"PK\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3738,
+      "offset": 4064,
       "length": 4,
       "value": "\"AE\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3758,
+      "offset": 4084,
       "length": 4,
       "value": "\"OM\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3778,
+      "offset": 4104,
       "length": 4,
       "value": "\"SA\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Modules\/PaymentInfo.swift",
       "kind": "StringLiteral",
-      "offset": 3798,
+      "offset": 4124,
       "length": 4,
       "value": "\"JO\""
     },
@@ -57147,168 +57543,245 @@
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 786,
+      "offset": 864,
       "length": 18,
       "value": "\"intention_detail\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 833,
+      "offset": 911,
       "length": 15,
       "value": "\"client_secret\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 879,
+      "offset": 957,
       "length": 17,
       "value": "\"payment_methods\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 992,
+      "offset": 1070,
       "length": 23,
       "value": "\"merchant_company_name\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 1042,
+      "offset": 1120,
       "length": 13,
       "value": "\"merchant_id\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 1084,
+      "offset": 1162,
       "length": 15,
       "value": "\"user_username\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 1122,
+      "offset": 1200,
       "length": 9,
       "value": "\"user_id\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 1159,
+      "offset": 1237,
       "length": 14,
       "value": "\"payment_keys\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 1203,
+      "offset": 1281,
       "length": 17,
       "value": "\"is_card_expired\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 1247,
+      "offset": 1325,
       "length": 13,
       "value": "\"card_tokens\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 1460,
-      "length": 12,
-      "value": "\"masked_pan\""
+      "offset": 1374,
+      "length": 22,
+      "value": "\"classified_discounts\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 1500,
-      "length": 14,
-      "value": "\"card_subtype\""
+      "offset": 1425,
+      "length": 16,
+      "value": "\"check_bin_fees\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 1561,
-      "length": 14,
-      "value": "\"card_expired\""
+      "offset": 1710,
+      "length": 23,
+      "value": "\"has_campaign_discount\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 2923,
-      "length": 6,
-      "value": "\"card\""
-    },
-    {
-      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
-      "kind": "StringLiteral",
-      "offset": 3006,
-      "length": 10,
-      "value": "\"e-wallet\""
-    },
-    {
-      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
-      "kind": "StringLiteral",
-      "offset": 3131,
+      "offset": 2190,
       "length": 18,
-      "value": "\"card-installment\""
+      "value": "\"cap_amount_cents\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 3172,
-      "length": 9,
-      "value": "\"aman_v3\""
+      "offset": 2243,
+      "length": 21,
+      "value": "\"discount_percentage\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 3253,
-      "length": 11,
-      "value": "\"apple-pay\""
+      "offset": 2299,
+      "length": 22,
+      "value": "\"discount_value_cents\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 4143,
+      "offset": 2359,
+      "length": 25,
+      "value": "\"discounted_amount_cents\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 2430,
       "length": 16,
       "value": "\"integration_id\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 4182,
+      "offset": 2705,
+      "length": 12,
+      "value": "\"masked_pan\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 2745,
+      "length": 14,
+      "value": "\"card_subtype\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 2806,
+      "length": 14,
+      "value": "\"card_expired\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 4193,
+      "length": 6,
+      "value": "\"card\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 4276,
+      "length": 10,
+      "value": "\"e-wallet\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 4401,
+      "length": 18,
+      "value": "\"card-installment\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 4442,
+      "length": 9,
+      "value": "\"aman_v3\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 4475,
+      "length": 10,
+      "value": "\"card_caf\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 4557,
+      "length": 11,
+      "value": "\"apple-pay\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 5310,
+      "length": 23,
+      "value": "\"amount_cents_with_caf\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 5386,
+      "length": 23,
+      "value": "\"original_amount_cents\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 5755,
+      "length": 16,
+      "value": "\"integration_id\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
+      "kind": "StringLiteral",
+      "offset": 5794,
       "length": 9,
       "value": "\"is_eKYC\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 4243,
+      "offset": 5855,
       "length": 13,
       "value": "\"method_type\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 4319,
+      "offset": 5931,
       "length": 21,
       "value": "\"merchant_identifier\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 4369,
+      "offset": 5981,
       "length": 15,
       "value": "\"extra_options\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/PaymentMethods\/Model\/RetrieveIntentionResponModel.swift",
       "kind": "StringLiteral",
-      "offset": 4665,
+      "offset": 6277,
       "length": 16,
       "value": "\"integration_id\""
     },
@@ -57346,6 +57819,13 @@
       "offset": 511,
       "length": 14,
       "value": "\"data.message\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/Wallet\/Model\/WalletDiscount\/WalletDiscountRequestModel.swift",
+      "kind": "StringLiteral",
+      "offset": 334,
+      "length": 15,
+      "value": "\"payment_token\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/Halan\/Model\/HalanPaymentRequestModel.swift",
@@ -57532,14 +58012,14 @@
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/OTP\/OtpVC.swift",
       "kind": "IntegerLiteral",
-      "offset": 1141,
+      "offset": 1133,
       "length": 1,
       "value": "4"
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Desktop\/IOS_Projects\/paymobsdk-ios\/PaymobSDK\/Scenes\/OTP\/OtpVC.swift",
       "kind": "IntegerLiteral",
-      "offset": 1145,
+      "offset": 1137,
       "length": 1,
       "value": "6"
     },
@@ -59753,138 +60233,145 @@
       "kind": "StringLiteral",
       "offset": 39046,
       "length": 6,
+      "value": "\"mail\""
+    },
+    {
+      "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
+      "kind": "StringLiteral",
+      "offset": 39170,
+      "length": 6,
       "value": "\"mogo\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 39196,
+      "offset": 39320,
       "length": 19,
       "value": "\"nativeExpAmexIcon\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 39359,
+      "offset": 39483,
       "length": 19,
       "value": "\"nativeExpCardIcon\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 39534,
+      "offset": 39658,
       "length": 25,
       "value": "\"nativeExpMasterCardIcon\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 39703,
+      "offset": 39827,
       "length": 19,
       "value": "\"nativeExpVisaIcon\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 39851,
+      "offset": 39975,
       "length": 12,
       "value": "\"new-Paymob\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 39981,
+      "offset": 40105,
       "length": 6,
       "value": "\"nift\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 40113,
+      "offset": 40237,
       "length": 10,
       "value": "\"plusIcon\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 40247,
+      "offset": 40371,
       "length": 9,
       "value": "\"postpay\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 40380,
+      "offset": 40504,
       "length": 9,
       "value": "\"premium\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 40525,
+      "offset": 40649,
       "length": 15,
       "value": "\"selectedRadio\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 40666,
+      "offset": 40790,
       "length": 10,
       "value": "\"souhoola\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 40798,
+      "offset": 40922,
       "length": 8,
       "value": "\"spotty\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 40926,
+      "offset": 41050,
       "length": 7,
       "value": "\"sympl\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 41053,
+      "offset": 41177,
       "length": 7,
       "value": "\"tabby\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 41182,
+      "offset": 41306,
       "length": 8,
       "value": "\"tamara\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 41461,
+      "offset": 41585,
       "length": 17,
       "value": "\"unselectedRadio\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 41596,
+      "offset": 41720,
       "length": 6,
       "value": "\"valu\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 41853,
+      "offset": 41977,
       "length": 10,
       "value": "\"visacard\""
     },
     {
       "filePath": "\/Users\/mahmoudyousef\/Library\/Developer\/Xcode\/DerivedData\/PaymobSDK-ambevhcatywzqwckhzmabrixcdxj\/Build\/Intermediates.noindex\/ArchiveIntermediates\/PaymobSDK\/IntermediateBuildFilesPath\/PaymobSDK.build\/Release-iphonesimulator\/PaymobSDK.build\/DerivedSources\/GeneratedAssetSymbols.swift",
       "kind": "StringLiteral",
-      "offset": 41985,
+      "offset": 42109,
       "length": 8,
       "value": "\"wallet\""
     }
