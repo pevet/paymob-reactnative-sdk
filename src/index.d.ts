@@ -34,8 +34,47 @@ declare module 'paymob-reactnative' {
 
   const Paymob: PaymobModule;
 
+  /**
+   * Visual theming for the embedded checkout. Colors are hex strings
+   * (e.g. `'#000000'`); numeric-like values (sizes, radius, padding) are
+   * passed as strings. Serialize with `JSON.stringify` into
+   * `PaymobCheckoutConfig.uiCustomization`.
+   */
+  export interface PaymobEmbeddedCustomization {
+    /** Primary/accent color, e.g. the payment button fill. */
+    colorPrimary?: string;
+    colorContainer?: string;
+    colorInputFields?: string;
+    colorDisabled?: string;
+    colorError?: string;
+    colorBorderInputFields?: string;
+    colorBorderPaymentButton?: string;
+    /** Text color of the payment button. */
+    textColorForPaymentButton?: string;
+    textColorForLabel?: string;
+    textColorForInputFields?: string;
+    colorForTextPlaceholder?: string;
+    radiusBorder?: string;
+    /** Label shown on the payment button. */
+    paymentButtonTitle?: string;
+    fontSizeLabel?: string;
+    fontSizeInputFields?: string;
+    fontSizePaymentButton?: string;
+    fontWeightLabel?: string;
+    fontWeightInputFields?: string;
+    fontWeightPaymentButton?: string;
+    widthOfContainer?: string;
+    verticalPadding?: string;
+    verticalSpacingBetweenComponents?: string;
+    containerPadding?: string;
+  }
+
   /** UI configuration passed to `PaymobCheckoutViewRef.configure`. */
   export interface PaymobCheckoutConfig {
+    /**
+     * JSON string of a {@link PaymobEmbeddedCustomization}, e.g.
+     * `JSON.stringify({ colorPrimary: '#000000' })`.
+     */
     uiCustomization?: string;
     showAddNewCard?: boolean;
     showSaveCard?: boolean;
