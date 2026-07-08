@@ -63,7 +63,7 @@ To get started with the `paymob-reactnative` package, follow these steps:
 To begin using the Paymob SDK in your React Native application, start by importing the module in your component:
 
 ```javascript
-import Paymob, { PaymentResult, CreditCardType } from 'paymob-reactnative';
+import Paymob, { PaymentStatus } from 'paymob-reactnative';
 ```
 
 ### SDK Customization
@@ -91,19 +91,25 @@ These customization options allow you to tailor the Paymob SDK interface to alig
 To handle payment results effectively, you can add a listener that will respond to different transaction statuses. This is crucial for providing feedback to users about their payment transactions:
 
 ```javascript
-Paymob.setSdkListener((status: PaymentResult) => {
-  switch (status) {
-    case PaymentResult.SUCCESS:
-      // Handle successful payment
+Paymob.setSdkListener((response: PaymentResponse) => {
+  switch (response.status) {
+    case PaymentStatus.SUCCESS:
+      // Handle successful payment (response.details holds the transaction data)
       break;
-    case PaymentResult.FAIL:
+    case PaymentStatus.FAIL:
       // Handle failed payment
       break;
-    case PaymentResult.PENDING:
+    case PaymentStatus.PENDING:
       // Handle pending payment status
       break;
   }
 });
+```
+
+Remember to remove the listener when it is no longer needed (e.g. on unmount):
+
+```javascript
+Paymob.removeSdkListener();
 ```
 
 This listener will allow you to implement logic based on the result of the payment process, enhancing the user experience.
@@ -113,22 +119,53 @@ This listener will allow you to implement logic based on the result of the payme
 After configuring the SDK, you can invoke the Paymob payment interface with the following code:
 
 ```javascript
-const savedBankCards = [
-  {
-    maskedPan: '1234', // The masked card number displayed to the user
-    savedCardToken: 'CARD_TOKEN', // The token representing the saved card
-    creditCard: CreditCardType.MASTERCARD, // The type of the credit card (e.g., Mastercard)
-  },
-];
-
-Paymob.presentPayVC('CLIENT_SECRET', 'PUBLIC_KEY', savedBankCards);
+Paymob.presentPayVC('CLIENT_SECRET', 'PUBLIC_KEY');
 ```
-
-**Note:** The `savedBankCards` parameter is optional. If you do not have saved bank cards to provide, you can simply call the `presentPayVC` method without it.
 
 This function call opens the Paymob payment interface, allowing users to complete their transactions securely. Make sure to replace `'CLIENT_SECRET'` and `'PUBLIC_KEY'` with your actual credentials.
 
-Here’s the updated explanation with a revised first sentence and the inclusion of the repository cloning step:
+The `CLIENT_SECRET` is obtained from your backend by calling Paymob's Intention Creation API (which uses your **secret key** — never ship the secret key in the app). The `PUBLIC_KEY` is your publishable key. See the [Mobile SDKs documentation](https://developers.paymob.com/paymob-docs/integration-paths/mobile-sdks) for the full backend-to-app flow.
+
+### Embedded (Inline) Checkout
+
+In addition to the full-screen flow above, you can embed the checkout directly inside your own screen using the `PaymobCheckoutView` component. Obtain a ref, call `configure()` once to set it up, then call `setPaymentKeys()` when the user is ready to pay:
+
+```tsx
+import { useEffect, useRef } from 'react';
+import { PaymobCheckoutView, type PaymobCheckoutViewRef } from 'paymob-reactnative';
+
+function Checkout() {
+  const checkoutRef = useRef<PaymobCheckoutViewRef>(null);
+
+  useEffect(() => {
+    checkoutRef.current?.configure({
+      showAddNewCard: true,
+      showSaveCard: true,
+      saveCardByDefault: false,
+      payFromOutside: false,
+    });
+  }, []);
+
+  const handlePay = () => {
+    checkoutRef.current?.setPaymentKeys({
+      publicKey: 'PUBLIC_KEY',
+      clientSecret: 'CLIENT_SECRET',
+    });
+  };
+
+  return (
+    <PaymobCheckoutView
+      ref={checkoutRef}
+      style={{ width: '100%' }}
+      onSuccess={(e) => console.log('Success', e.nativeEvent)}
+      onFailure={(e) => console.log('Failure', e.nativeEvent?.error)}
+      onPending={() => console.log('Pending')}
+    />
+  );
+}
+```
+
+The view reports its result through the `onSuccess` / `onFailure` / `onPending` callbacks (not through `setSdkListener`, which is only used by the full-screen flow). The component measures its own height, so give it a width and let the height size itself.
 
 ## Example App
 

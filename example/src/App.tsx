@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Config from 'react-native-config';
 import {
   StyleSheet,
   View,
@@ -17,7 +18,9 @@ import Paymob, {
 import PaymobEmbeddedView from './PaymobEmbeddedView';
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'home' | 'embedded'>('home');
+  const [currentScreen, setCurrentScreen] = useState<'home' | 'embedded'>(
+    'home'
+  );
   const [appName, setAppName] = useState<string>('');
   const [isSaveCardEnabled, setSaveCardEnabled] = useState<boolean>(true);
   const [isShowConfirmationPage, setShowConfirmationPage] =
@@ -221,8 +224,8 @@ export default function App() {
         <Button
           onPress={() => {
             Paymob.presentPayVC(
-              'egy_csk_test_470ff99341ee584adf6ee587f7d199be',
-              'egy_pk_test_jbtqjbZUZpcvIjvMSHrAXVQ2dFVsS0xi'
+              Config.PAYMOB_CLIENT_SECRET ?? '',
+              Config.PAYMOB_PUBLIC_KEY ?? ''
             );
           }}
           title="Present Paymob"

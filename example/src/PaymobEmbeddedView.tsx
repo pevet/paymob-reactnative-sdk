@@ -1,173 +1,127 @@
 import Config from 'react-native-config';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-    View,
-    Text,
-    Button,
-    StyleSheet,
-    ActivityIndicator,
-    requireNativeComponent,
-    UIManager,
-    findNodeHandle,
-    Platform,
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
-
-import type { ViewStyle, StyleProp } from 'react-native';
+import {
+  PaymobCheckoutView,
+  type PaymobCheckoutViewRef,
+} from 'paymob-reactnative';
 
 interface PaymobEmbeddedViewProps {
-    onBack: () => void;
+  onBack: () => void;
 }
 
-type PaymobCheckoutViewProps = {
-    style?: StyleProp<ViewStyle>;
-    onSuccess?: (event: any) => void;
-    onFailure?: (event: any) => void;
-    onPending?: (event: any) => void;
-};
+export default function PaymobEmbeddedView({
+  onBack,
+}: PaymobEmbeddedViewProps) {
+  const checkoutRef = useRef<PaymobCheckoutViewRef>(null);
+  const [loading] = useState(false);
+  const [status, setStatus] = useState<string>('');
 
-const ComponentName = 'PaymobCheckoutView';
+  // Secrets (In real app, fetch these securely)
+  const publicKey = Config.PAYMOB_PUBLIC_KEY ?? '';
+  const clientSecret = Config.PAYMOB_CLIENT_SECRET ?? '';
 
-const PaymobCheckoutView =
-    requireNativeComponent<PaymobCheckoutViewProps>(ComponentName);
+  // 1. Initial Configure (Settings only)
+  useEffect(() => {
+    checkoutRef.current?.configure({
+      showAddNewCard: true,
+      showSaveCard: true,
+      saveCardByDefault: false,
+      payFromOutside: false,
+    });
+    setStatus('Ready to Pay');
+  }, []);
 
-export default function PaymobEmbeddedView({ onBack }: PaymobEmbeddedViewProps) {
-    const nativeViewRef = useRef<any>(null);
-    const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState<string>('');
+  // 2. Pay Button Handler (Sets Keys)
+  const handlePay = () => {
+    setStatus('Initializing Payment...');
+    checkoutRef.current?.setPaymentKeys({ publicKey, clientSecret });
+  };
 
-    // Secrets (In real app, fetch these securely)
-    const publicKey = Config.PAYMOB_PUBLIC_KEY;
-    const clientSecret = Config.PAYMOB_CLIENT_SECRET;
+  const handleSuccess = (event: any) => {
+    console.log('Paymob Success:', event.nativeEvent);
+    setStatus('Success: ' + JSON.stringify(event.nativeEvent));
+  };
 
-    // 1. Initial Configure (Settings only)
-    useEffect(() => {
-        if (nativeViewRef.current) {
-            const config = {
-                showAddNewCard: true,
-                showSaveCard: true,
-                saveCardByDefault: false,
-                payFromOutside: false,
-            };
+  const handleFailure = (event: any) => {
+    console.log('Paymob Failure:', event.nativeEvent);
+    setStatus('Failure: ' + (event.nativeEvent?.error || 'Unknown'));
+  };
 
-            const handle = findNodeHandle(nativeViewRef.current);
-            if (handle) {
-                // Dispatch CONFIGURE
-                dispatchCommand(handle as number, 'configure', [config]);
-            }
-            setStatus('Ready to Pay');
-        }
-    }, []);
+  const handlePending = (event: any) => {
+    console.log('Paymob Pending:', event.nativeEvent);
+    setStatus('Pending');
+  };
 
-    // 2. Pay Button Handler (Sets Keys)
-    const handlePay = () => {
-        if (nativeViewRef.current) {
-            setStatus('Initializing Payment...');
-            const handle = findNodeHandle(nativeViewRef.current);
-            if (handle) {
-                const keysConfig = {
-                    publicKey,
-                    clientSecret
-                };
-                dispatchCommand(handle as number, 'setPaymentKeys', [keysConfig]);
-            }
-        }
-    };
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Checkout</Text>
+      </View>
 
-    const dispatchCommand = (handle: number, commandId: string, args: any[]) => {
-        UIManager.dispatchViewManagerCommand(handle, commandId, args);
+      <Text style={styles.status}>{status}</Text>
+      {loading && <ActivityIndicator size="large" color="#0000ff" />}
 
-        // iOS Compatibility check for UIManager lookups if needed
-        if (Platform.OS === 'ios') {
-            const viewManagerConfig = UIManager.getViewManagerConfig('PaymobCheckoutView');
-            if (viewManagerConfig && viewManagerConfig.Commands) {
-                const cmd = viewManagerConfig.Commands[commandId];
-                if (cmd != null) {
-                    UIManager.dispatchViewManagerCommand(handle, cmd, args);
-                }
-            }
-        }
-    }
+      <PaymobCheckoutView
+        ref={checkoutRef}
+        style={styles.embeddedView}
+        onSuccess={handleSuccess}
+        onFailure={handleFailure}
+        onPending={handlePending}
+      />
 
-
-    const handleSuccess = (event: any) => {
-        console.log('Paymob Success:', event.nativeEvent);
-        setStatus('Success: ' + JSON.stringify(event.nativeEvent));
-    };
-
-    const handleFailure = (event: any) => {
-        console.log('Paymob Failure:', event.nativeEvent);
-        setStatus('Failure: ' + (event.nativeEvent?.error || 'Unknown'));
-    };
-
-    const handlePending = (event: any) => {
-        console.log('Paymob Pending:', event.nativeEvent);
-        setStatus('Pending');
-    };
-
-    return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Checkout</Text>
-            </View>
-
-            <Text style={styles.status}>{status}</Text>
-            {loading && <ActivityIndicator size="large" color="#0000ff" />}
-
-            <PaymobCheckoutView
-                ref={nativeViewRef}
-                style={styles.embeddedView}
-                onSuccess={handleSuccess}
-                onFailure={handleFailure}
-                onPending={handlePending}
-            />
-
-            <View style={styles.footer}>
-                <View style={styles.buttonContainer}>
-                    <Button title="Pay / Load Keys" onPress={handlePay} color="#6200EE" />
-                </View>
-                <View style={{ height: 10 }} />
-                <View style={styles.buttonContainer}>
-                    <Button title="Back" onPress={onBack} color="#333" />
-                </View>
-            </View>
+      <View style={styles.footer}>
+        <View style={styles.buttonContainer}>
+          <Button title="Pay / Load Keys" onPress={handlePay} color="#6200EE" />
         </View>
-    );
+        <View style={{ height: 10 }} />
+        <View style={styles.buttonContainer}>
+          <Button title="Back" onPress={onBack} color="#333" />
+        </View>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center', // Center title
-        padding: 16,
-        backgroundColor: '#fff',
-        elevation: 2,
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        // marginLeft: 16, // Removed margin since it's centered
-    },
-    status: {
-        textAlign: 'center',
-        margin: 10,
-        color: 'gray'
-    },
-    embeddedView: {
-        width: '100%',
-        backgroundColor: 'white' // Ensure visible
-    },
-    footer: {
-        padding: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#f5f5f5',
-    },
-    buttonContainer: {
-        width: '50%',
-    }
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center', // Center title
+    padding: 16,
+    backgroundColor: '#fff',
+    elevation: 2,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  status: {
+    textAlign: 'center',
+    margin: 10,
+    color: 'gray',
+  },
+  embeddedView: {
+    width: '100%',
+    backgroundColor: 'white', // Ensure visible
+  },
+  footer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  buttonContainer: {
+    width: '50%',
+  },
 });

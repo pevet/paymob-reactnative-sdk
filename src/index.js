@@ -4,6 +4,7 @@ import {
   Platform,
   processColor,
 } from 'react-native';
+import PaymobCheckoutView from './PaymobCheckoutView';
 
 const LINKING_ERROR =
   `The package 'paymob-reactnative' doesn't seem to be linked. Make sure: \n\n` +
@@ -83,9 +84,9 @@ const Paymob = {
     PaymobReactnative.setShowTransactionResult(isVisible);
   },
   /**
-    * Sets whether or not the SDK handles custom keyboard appearance.
-    * @param {boolean} isEnabled - A boolean to enable/disable.
-    */
+   * Sets whether or not the SDK handles custom keyboard appearance.
+   * @param {boolean} isEnabled - A boolean to enable/disable.
+   */
   setKeyboardHandlingEnabled(isEnabled) {
     PaymobReactnative.setKeyboardHandlingEnabled(isEnabled);
   },
@@ -126,5 +127,7 @@ export const PaymentStatus = {
   FAIL: 'Fail',
   PENDING: 'Pending',
 };
+
+export { PaymobCheckoutView };
 
 export default Paymob;
