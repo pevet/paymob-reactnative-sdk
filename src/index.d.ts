@@ -39,6 +39,13 @@ declare module 'paymob-reactnative' {
    * (e.g. `'#000000'`); numeric-like values (sizes, radius, padding) are
    * passed as strings. Serialize with `JSON.stringify` into
    * `PaymobCheckoutConfig.uiCustomization`.
+   *
+   * WARNING: the native SDKs expect DIFFERENT JSON key formats. The property
+   * names below match the Android SDK (camelCase, e.g. `colorPrimary`). The
+   * iOS SDK instead decodes Title_Case_With_Underscores keys
+   * (e.g. `Color_Primary`, `Text_Color_For_Payment_Button`,
+   * `Payment_Button_Title`). Build the JSON with the key format that matches
+   * the platform you are targeting.
    */
   export interface PaymobEmbeddedCustomization {
     /** Primary/accent color, e.g. the payment button fill. */

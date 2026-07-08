@@ -14,7 +14,6 @@ import {
 import {
   PaymobCheckoutView,
   type PaymobCheckoutViewRef,
-  type PaymobEmbeddedCustomization,
 } from 'paymob-reactnative';
 import { createIntention } from './api/paymob';
 
@@ -50,11 +49,17 @@ function extractSavedCard(details: any): SavedCardInfo | null {
 }
 
 // Inline (embedded) checkout theming. Colors are hex strings.
-const CUSTOMIZATION: PaymobEmbeddedCustomization = {
-  colorPrimary: '#07F0D7', // payment button background (active)
-  textColorForPaymentButton: '#051926', // payment button text
-  radiusBorder: '8',
-  paymentButtonTitle: 'Pay now',
+//
+// IMPORTANT: the native iOS SDK decodes this JSON with
+// Title_Case_With_Underscores keys (e.g. `Color_Primary`), which differ from
+// the Android SDK's camelCase keys (e.g. `colorPrimary`). This example targets
+// iOS, so the iOS key names are used here.
+const CUSTOMIZATION: Record<string, string> = {
+  Color_Primary: '#07F0D7', // payment button background (active)
+  Color_Disabled: '#C7CDD1', // payment button background (inactive/disabled)
+  Text_Color_For_Payment_Button: '#051926', // payment button text
+  Radius_Border: '8',
+  Payment_Button_Title: 'Pay now',
 };
 
 export default function CheckoutScreen() {
