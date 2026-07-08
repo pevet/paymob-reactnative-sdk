@@ -18,6 +18,7 @@ import {
 import {
   createIntention,
   getTransactionResult,
+  type SavedCard,
   type TransactionResult,
 } from './api/paymob';
 
@@ -112,6 +113,7 @@ export default function CheckoutScreen() {
   const [amount, setAmount] = useState<string>('1.500');
   const [loading, setLoading] = useState<boolean>(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
 
   const publicKey = Config.PAYMOB_PUBLIC_KEY ?? '';
 
@@ -144,10 +146,15 @@ export default function CheckoutScreen() {
     setLoading(true);
     try {
       // Backend creates the intention (with the secret key) and returns the
-      // client secret plus a reference we use to look up the result later.
-      const { clientSecret: secret, reference } =
-        await createIntention(amountOmr);
+      // client secret, a reference we use to look up the result later, and the
+      // saved cards it knows about.
+      const {
+        clientSecret: secret,
+        reference,
+        savedCards: cards,
+      } = await createIntention(amountOmr);
       referenceRef.current = reference;
+      setSavedCards(cards);
       setClientSecret(secret);
     } catch (error: any) {
       Alert.alert('Could not start payment', error?.message ?? 'Unknown error');
@@ -159,6 +166,7 @@ export default function CheckoutScreen() {
   const reset = () => {
     referenceRef.current = null;
     setClientSecret(null);
+    setSavedCards([]);
     setAmount('1.500');
   };
 
@@ -237,6 +245,19 @@ export default function CheckoutScreen() {
           </View>
         ) : (
           <>
+            {savedCards.length > 0 && (
+              <View style={styles.savedCards}>
+                <Text style={styles.savedCardsTitle}>Saved cards</Text>
+                {savedCards.map((c, i) => (
+                  <View key={c.token ?? String(i)} style={styles.savedCardRow}>
+                    <Text style={styles.savedCardType}>
+                      {c.cardType ?? 'Card'}
+                    </Text>
+                    <Text style={styles.savedCardPan}>{c.maskedPan ?? ''}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
             <PaymobCheckoutView
               ref={checkoutRef}
               style={styles.embedded}
@@ -289,6 +310,35 @@ const styles = StyleSheet.create({
   payButton: {
     minHeight: 48,
     justifyContent: 'center',
+  },
+  savedCards: {
+    marginBottom: 20,
+  },
+  savedCardsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  savedCardRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    marginBottom: 8,
+    backgroundColor: '#fafafa',
+  },
+  savedCardType: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#051926',
+  },
+  savedCardPan: {
+    fontSize: 15,
+    color: '#555555',
   },
   embedded: {
     width: '100%',

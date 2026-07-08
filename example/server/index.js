@@ -74,6 +74,14 @@ function persistSavedCard(record) {
   }
 }
 
+// All persisted saved cards, most recent first. (Demo-global: there is no
+// customer auth here, so every persisted card is returned.)
+function listSavedCards() {
+  return Object.values(savedCards).sort((a, b) =>
+    String(b.receivedAt).localeCompare(String(a.receivedAt))
+  );
+}
+
 const app = express();
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -137,7 +145,12 @@ app.post('/intentions', async (req, res) => {
     // Seed so the app's poll gets a definite "not settled yet" answer.
     results.set(reference, { status: 'Created', updatedAt: Date.now() });
     console.log(`[intention] created reference=${reference} amount=${amount}`);
-    res.json({ clientSecret: data.client_secret, reference });
+    // Include the saved cards so the app can offer them alongside checkout.
+    res.json({
+      clientSecret: data.client_secret,
+      reference,
+      savedCards: listSavedCards(),
+    });
   } catch (err) {
     console.error('[intention] error', err);
     res.status(500).json({ error: String(err?.message || err) });
@@ -239,10 +252,7 @@ app.get('/tx/:reference', (req, res) => {
 
 // All persisted saved cards (most recent first).
 app.get('/saved-cards', (_req, res) => {
-  const cards = Object.values(savedCards).sort((a, b) =>
-    String(b.receivedAt).localeCompare(String(a.receivedAt))
-  );
-  res.json(cards);
+  res.json(listSavedCards());
 });
 
 app.get('/', (_req, res) =>

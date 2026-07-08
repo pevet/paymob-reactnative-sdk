@@ -12,15 +12,26 @@ const BACKEND_URL = (
   Config.PAYMOB_BACKEND_URL ?? 'http://localhost:3000'
 ).replace(/\/$/, '');
 
+export interface SavedCard {
+  token?: string;
+  maskedPan?: string;
+  cardType?: string;
+  email?: string | null;
+  reference?: string | null;
+  receivedAt?: string;
+}
+
 export interface CreateIntentionResult {
   clientSecret: string;
   reference: string;
+  savedCards: SavedCard[];
 }
 
 /**
  * Asks the backend to create a payment intention for the given amount (OMR).
- * Returns the client secret used to initialise the SDK plus a reference the app
- * uses to look up the authoritative result later.
+ * Returns the client secret used to initialise the SDK, a reference the app
+ * uses to look up the authoritative result later, and the saved cards known to
+ * the backend.
  */
 export async function createIntention(
   amountOmr: number
@@ -39,17 +50,16 @@ export async function createIntention(
   const data = JSON.parse(text) as {
     clientSecret?: string;
     reference?: string;
+    savedCards?: SavedCard[];
   };
   if (!data.clientSecret || !data.reference) {
     throw new Error('Backend did not return a clientSecret/reference.');
   }
-  return { clientSecret: data.clientSecret, reference: data.reference };
-}
-
-export interface SavedCard {
-  token?: string;
-  maskedPan?: string;
-  cardType?: string;
+  return {
+    clientSecret: data.clientSecret,
+    reference: data.reference,
+    savedCards: data.savedCards ?? [],
+  };
 }
 
 export interface TransactionResult {
