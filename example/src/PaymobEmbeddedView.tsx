@@ -35,8 +35,8 @@ export default function PaymobEmbeddedView({ onBack }: PaymobEmbeddedViewProps) 
     const [status, setStatus] = useState<string>('');
 
     // Secrets (In real app, fetch these securely)
-    const publicKey = 'egy_pk_test_huLoawdiICfwok1UVzEvQ4R3OajoyI1b';
-    const clientSecret = 'egy_csk_test_6444aa2bb1ba00364ce9a5bc46a146b9';
+    const publicKey = 'omn_pk_test_Ppg36Sfq6GjmmDTZx8Ph300OcqiE1S5x';
+    const clientSecret = 'omn_csk_test_c06fff8f17222edcee283e93736715ea';
 
     // 1. Initial Configure (Settings only)
     useEffect(() => {

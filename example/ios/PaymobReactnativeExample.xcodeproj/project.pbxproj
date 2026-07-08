@@ -8,13 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* PaymobReactnativeExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* PaymobReactnativeExampleTests.m */; };
+		03681F1D4F1538A66EC0AE28 /* libPods-PaymobReactnativeExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D1BEB7F87A6406913DFECF51 /* libPods-PaymobReactnativeExample.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		22718700FC833B1D6A4B18CB /* libPods-PaymobReactnativeExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FEDDA1160B8920D83F4BD /* libPods-PaymobReactnativeExample.a */; };
-		372F6158330D85067998ED3E /* libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1053B12B43110DC3FA1C6177 /* libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		A0688DF72CB60B48003CB3B6 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0688DF62CB60B48003CB3B6 /* File.swift */; };
+		A61CADAB925CCCED1D63AAD8 /* libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EB6BA77616E277B77B576EF /* libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a */; };
 		FEE50A5817064BB5CC789541 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 96E9EBC0AAC4CFBE14811414 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
@@ -32,7 +32,6 @@
 		00E356EE1AD99517003FC87E /* PaymobReactnativeExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PaymobReactnativeExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* PaymobReactnativeExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PaymobReactnativeExampleTests.m; sourceTree = "<group>"; };
-		1053B12B43110DC3FA1C6177 /* libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* PaymobReactnativeExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PaymobReactnativeExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = PaymobReactnativeExample/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = PaymobReactnativeExample/AppDelegate.mm; sourceTree = "<group>"; };
@@ -40,15 +39,16 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PaymobReactnativeExample/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = PaymobReactnativeExample/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = PaymobReactnativeExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		63C27D8E2D971101D2537DD3 /* Pods-PaymobReactnativeExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PaymobReactnativeExample.release.xcconfig"; path = "Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample.release.xcconfig"; sourceTree = "<group>"; };
-		728FEDDA1160B8920D83F4BD /* libPods-PaymobReactnativeExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PaymobReactnativeExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3EB6BA77616E277B77B576EF /* libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C02FDBC5DD6AD18A7731275 /* Pods-PaymobReactnativeExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PaymobReactnativeExample.release.xcconfig"; path = "Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = PaymobReactnativeExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		8D43B94AB0AF274F0CDFC305 /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
-		914F8D1F71BD062B09DC3F5E /* Pods-PaymobReactnativeExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PaymobReactnativeExample.debug.xcconfig"; path = "Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample.debug.xcconfig"; sourceTree = "<group>"; };
+		860420A8B1D7845A24498A7D /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.release.xcconfig"; path = "Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		96E9EBC0AAC4CFBE14811414 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = PaymobReactnativeExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		983343AB655CD67EB84CA6A1 /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.release.xcconfig"; path = "Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		999D47F04CD8A75677AB3EC9 /* Pods-PaymobReactnativeExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PaymobReactnativeExample.debug.xcconfig"; path = "Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample.debug.xcconfig"; sourceTree = "<group>"; };
 		A0688DF52CB60B48003CB3B6 /* PaymobReactnativeExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PaymobReactnativeExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		A0688DF62CB60B48003CB3B6 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		B5A857393C28A17831873224 /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		D1BEB7F87A6406913DFECF51 /* libPods-PaymobReactnativeExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PaymobReactnativeExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -57,7 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				372F6158330D85067998ED3E /* libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a in Frameworks */,
+				A61CADAB925CCCED1D63AAD8 /* libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,7 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22718700FC833B1D6A4B18CB /* libPods-PaymobReactnativeExample.a in Frameworks */,
+				03681F1D4F1538A66EC0AE28 /* libPods-PaymobReactnativeExample.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,8 +110,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				728FEDDA1160B8920D83F4BD /* libPods-PaymobReactnativeExample.a */,
-				1053B12B43110DC3FA1C6177 /* libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a */,
+				D1BEB7F87A6406913DFECF51 /* libPods-PaymobReactnativeExample.a */,
+				3EB6BA77616E277B77B576EF /* libPods-PaymobReactnativeExample-PaymobReactnativeExampleTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -150,10 +150,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				914F8D1F71BD062B09DC3F5E /* Pods-PaymobReactnativeExample.debug.xcconfig */,
-				63C27D8E2D971101D2537DD3 /* Pods-PaymobReactnativeExample.release.xcconfig */,
-				8D43B94AB0AF274F0CDFC305 /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.debug.xcconfig */,
-				983343AB655CD67EB84CA6A1 /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.release.xcconfig */,
+				999D47F04CD8A75677AB3EC9 /* Pods-PaymobReactnativeExample.debug.xcconfig */,
+				7C02FDBC5DD6AD18A7731275 /* Pods-PaymobReactnativeExample.release.xcconfig */,
+				B5A857393C28A17831873224 /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.debug.xcconfig */,
+				860420A8B1D7845A24498A7D /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -165,12 +165,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "PaymobReactnativeExampleTests" */;
 			buildPhases = (
-				52D1A850E862637FCA83D997 /* [CP] Check Pods Manifest.lock */,
+				9F881B39C18FB59BBF0DA43A /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				DC7C6789E7C87B515ACF39A3 /* [CP] Embed Pods Frameworks */,
-				DB15F638D36842A46C1F70CB /* [CP] Copy Pods Resources */,
+				0CA934757FC17373925EECFF /* [CP] Embed Pods Frameworks */,
+				B25BBA78523E401040700C75 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -186,13 +186,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "PaymobReactnativeExample" */;
 			buildPhases = (
-				BD05C56046AFA714F9C9A4B0 /* [CP] Check Pods Manifest.lock */,
+				132DBAE3190818FAA80963A4 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				8BA83C651B2ADD782BCA7E91 /* [CP] Embed Pods Frameworks */,
-				C6EE7255A82F75CB24A0A636 /* [CP] Copy Pods Resources */,
+				488D742F242C0E0B16D83A73 /* [CP] Embed Pods Frameworks */,
+				F48CD0DDFF8699A938AD806C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -276,46 +276,28 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		52D1A850E862637FCA83D997 /* [CP] Check Pods Manifest.lock */ = {
+		0CA934757FC17373925EECFF /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		8BA83C651B2ADD782BCA7E91 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BD05C56046AFA714F9C9A4B0 /* [CP] Check Pods Manifest.lock */ = {
+		132DBAE3190818FAA80963A4 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -337,24 +319,50 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C6EE7255A82F75CB24A0A636 /* [CP] Copy Pods Resources */ = {
+		488D742F242C0E0B16D83A73 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		DB15F638D36842A46C1F70CB /* [CP] Copy Pods Resources */ = {
+		9F881B39C18FB59BBF0DA43A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B25BBA78523E401040700C75 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -362,30 +370,38 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		DC7C6789E7C87B515ACF39A3 /* [CP] Embed Pods Frameworks */ = {
+		F48CD0DDFF8699A938AD806C /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Embed Pods Frameworks";
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests/Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PaymobReactnativeExample/Pods-PaymobReactnativeExample-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -422,7 +438,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8D43B94AB0AF274F0CDFC305 /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.debug.xcconfig */;
+			baseConfigurationReference = B5A857393C28A17831873224 /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -449,7 +465,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 983343AB655CD67EB84CA6A1 /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.release.xcconfig */;
+			baseConfigurationReference = 860420A8B1D7845A24498A7D /* Pods-PaymobReactnativeExample-PaymobReactnativeExampleTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -473,12 +489,12 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 914F8D1F71BD062B09DC3F5E /* Pods-PaymobReactnativeExample.debug.xcconfig */;
+			baseConfigurationReference = 999D47F04CD8A75677AB3EC9 /* Pods-PaymobReactnativeExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = FPGDG9D69D;
+				DEVELOPMENT_TEAM = 5N677U2M6G;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PaymobReactnativeExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -491,7 +507,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = paymobreactnative.example;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pev.paymobexample;
 				PRODUCT_NAME = PaymobReactnativeExample;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -501,12 +517,12 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 63C27D8E2D971101D2537DD3 /* Pods-PaymobReactnativeExample.release.xcconfig */;
+			baseConfigurationReference = 7C02FDBC5DD6AD18A7731275 /* Pods-PaymobReactnativeExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = FPGDG9D69D;
+				DEVELOPMENT_TEAM = 5N677U2M6G;
 				INFOPLIST_FILE = PaymobReactnativeExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -518,7 +534,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = paymobreactnative.example;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pev.paymobexample;
 				PRODUCT_NAME = PaymobReactnativeExample;
 				SWIFT_OBJC_BRIDGING_HEADER = "PaymobReactnativeExample-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -599,10 +615,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -675,10 +688,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
