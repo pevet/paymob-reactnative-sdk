@@ -51,8 +51,8 @@ function extractSavedCard(details: any): SavedCardInfo | null {
 
 // Inline (embedded) checkout theming. Colors are hex strings.
 const CUSTOMIZATION: PaymobEmbeddedCustomization = {
-  colorPrimary: '#000000', // payment button background
-  textColorForPaymentButton: '#FFFFFF', // payment button text
+  colorPrimary: '#07F0D7', // payment button background (active)
+  textColorForPaymentButton: '#051926', // payment button text
   radiusBorder: '8',
   paymentButtonTitle: 'Pay now',
 };
