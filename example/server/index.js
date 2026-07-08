@@ -11,9 +11,11 @@
  *                                  - TOKEN:       the saved-card token (when the
  *                                                 shopper opted to save the card)
  *   3. GET  /tx/:reference        The app polls this for the result + saved card.
+ *   4. GET  /saved-cards          Lists saved cards persisted from TOKEN callbacks.
  *
- * Storage is in-memory (a Map) to keep the demo minimal; use a real datastore
- * in production.
+ * Transaction results are held in-memory (a Map) to keep the demo minimal;
+ * saved cards are also persisted to a local JSON file so tokens survive
+ * restarts. Use a real datastore in production.
  *
  * NOTE: Paymob posts the webhook from their servers, so notification_url must be
  * a PUBLIC url. In local dev, expose this server with a tunnel (ngrok/
@@ -23,6 +25,8 @@
 
 require('dotenv').config();
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 
 const PORT = process.env.PORT || 3000;
@@ -40,6 +44,36 @@ const results = new Map(); // reference -> { status, transactionId, amountCents,
 const refByOrderId = new Map(); // paymob order id -> reference
 const pendingTokensByOrderId = new Map(); // paymob order id -> savedCard (TOKEN arrived before TRANSACTION)
 
+// --- Saved-card persistence (local JSON file, keyed by token) ---------------
+// Durable so tokens survive restarts. Contains card tokens/PII, so it's
+// gitignored. A real integration would use a datastore keyed to the customer.
+const SAVED_CARDS_FILE = path.join(__dirname, 'saved-cards.json');
+
+function loadSavedCards() {
+  try {
+    return JSON.parse(fs.readFileSync(SAVED_CARDS_FILE, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+const savedCards = loadSavedCards(); // token -> record
+
+function persistSavedCard(record) {
+  if (!record || !record.token) {
+    return;
+  }
+  savedCards[record.token] = record;
+  try {
+    fs.writeFileSync(SAVED_CARDS_FILE, JSON.stringify(savedCards, null, 2));
+    console.log(
+      `[saved-cards] persisted token=${record.token.slice(0, 8)}… (${Object.keys(savedCards).length} total)`
+    );
+  } catch (err) {
+    console.error('[saved-cards] write failed', err);
+  }
+}
+
 const app = express();
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -48,11 +82,15 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/intentions', async (req, res) => {
   try {
     if (!SECRET_KEY) {
-      return res.status(500).json({ error: 'PAYMOB_SECRET_KEY not configured' });
+      return res
+        .status(500)
+        .json({ error: 'PAYMOB_SECRET_KEY not configured' });
     }
     const amountOmr = Number(req.body?.amount);
     if (!Number.isFinite(amountOmr) || amountOmr <= 0) {
-      return res.status(400).json({ error: 'amount must be a positive number' });
+      return res
+        .status(400)
+        .json({ error: 'amount must be a positive number' });
     }
     // OMR has 3 decimals; Paymob expects the smallest subunit (baisa).
     const amount = Math.round(amountOmr * 1000);
@@ -78,20 +116,22 @@ app.post('/intentions', async (req, res) => {
     const resp = await fetch(INTENTION_URL, {
       method: 'POST',
       headers: {
-        Authorization: `Token ${SECRET_KEY}`,
+        'Authorization': `Token ${SECRET_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
     });
     const text = await resp.text();
     if (!resp.ok) {
-      return res
-        .status(502)
-        .json({ error: `intention failed (${resp.status}): ${text.slice(0, 300)}` });
+      return res.status(502).json({
+        error: `intention failed (${resp.status}): ${text.slice(0, 300)}`,
+      });
     }
     const data = JSON.parse(text);
     if (!data.client_secret) {
-      return res.status(502).json({ error: 'no client_secret in intention response' });
+      return res
+        .status(502)
+        .json({ error: 'no client_secret in intention response' });
     }
 
     // Seed so the app's poll gets a definite "not settled yet" answer.
@@ -120,7 +160,11 @@ app.post('/paymob/webhook', (req, res) => {
     // NOTE: TRANSACTION sends order.id as a number but TOKEN sends order_id as
     // a string, so normalize to a string key for correlation.
     const orderKey = obj?.order?.id != null ? String(obj.order.id) : null;
-    const status = obj?.success ? 'Success' : obj?.pending ? 'Pending' : 'Failed';
+    const status = obj?.success
+      ? 'Success'
+      : obj?.pending
+        ? 'Pending'
+        : 'Failed';
 
     const existing = (reference && results.get(reference)) || {};
     const savedCard =
@@ -155,7 +199,21 @@ app.post('/paymob/webhook', (req, res) => {
       // TOKEN arrived before TRANSACTION; reconcile when TRANSACTION lands.
       pendingTokensByOrderId.set(orderKey, savedCard);
     }
-    console.log(`[webhook] TOKEN orderId=${orderKey} maskedPan=${savedCard.maskedPan}`);
+
+    // Persist the saved card durably (survives restarts).
+    persistSavedCard({
+      token: savedCard.token,
+      maskedPan: savedCard.maskedPan,
+      cardType: savedCard.cardType,
+      email: obj?.email ?? null,
+      orderId: orderKey,
+      reference: reference ?? null,
+      receivedAt: new Date().toISOString(),
+    });
+
+    console.log(
+      `[webhook] TOKEN orderId=${orderKey} maskedPan=${savedCard.maskedPan}`
+    );
   } else {
     console.log(`[webhook] ignored type=${type}`);
   }
@@ -179,7 +237,17 @@ app.get('/tx/:reference', (req, res) => {
   });
 });
 
-app.get('/', (_req, res) => res.json({ ok: true, notificationUrl: NOTIFICATION_URL }));
+// All persisted saved cards (most recent first).
+app.get('/saved-cards', (_req, res) => {
+  const cards = Object.values(savedCards).sort((a, b) =>
+    String(b.receivedAt).localeCompare(String(a.receivedAt))
+  );
+  res.json(cards);
+});
+
+app.get('/', (_req, res) =>
+  res.json({ ok: true, notificationUrl: NOTIFICATION_URL })
+);
 
 /**
  * Verifies Paymob's HMAC (SHA-512 over an ordered field concatenation, compared
@@ -225,7 +293,9 @@ app.listen(PORT, () => {
   console.log(`Paymob demo backend on http://localhost:${PORT}`);
   console.log(`notification_url -> ${NOTIFICATION_URL}`);
   if (!HMAC_SECRET) {
-    console.warn('PAYMOB_HMAC_SECRET not set — webhook HMAC verification is DISABLED.');
+    console.warn(
+      'PAYMOB_HMAC_SECRET not set — webhook HMAC verification is DISABLED.'
+    );
   }
   if (PUBLIC_URL.includes('localhost')) {
     console.warn(

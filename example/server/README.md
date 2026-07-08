@@ -9,6 +9,10 @@ Minimal Express server showing the server-side half of a Paymob integration:
   authoritative `TRANSACTION` result and the `TOKEN` (saved card) callback,
   correlating them by order id.
 - `GET /tx/:reference` — the app polls this for `{ status, savedCard, ... }`.
+- `GET /saved-cards` — lists cards persisted from `TOKEN` callbacks.
+
+Saved cards are written to `saved-cards.json` (gitignored — it holds card
+tokens/PII) and reloaded on startup, so they survive restarts.
 
 ## Run
 
