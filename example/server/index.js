@@ -104,10 +104,18 @@ app.post('/intentions', async (req, res) => {
     const amount = Math.round(amountOmr * 1000);
     const reference = `rn_demo_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
 
+    // Pre-load saved cards into the checkout by passing their tokens. Paymob
+    // silently drops invalid/expired tokens, so sending the whole list is safe.
+    // (Demo-global; scope to the authenticated customer in production.)
+    const cardTokens = listSavedCards()
+      .map((c) => c.token)
+      .filter(Boolean);
+
     const body = {
       amount,
       currency: CURRENCY,
       payment_methods: PAYMENT_METHODS,
+      card_tokens: cardTokens,
       items: [],
       billing_data: {
         first_name: 'Test',
