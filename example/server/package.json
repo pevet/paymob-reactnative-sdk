@@ -1,0 +1,17 @@
+{
+  "name": "paymob-demo-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal demo backend: creates Paymob intentions, receives the transaction/token webhook, and serves a result lookup the app polls.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

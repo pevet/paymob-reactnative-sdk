@@ -15,7 +15,11 @@ import {
   PaymobCheckoutView,
   type PaymobCheckoutViewRef,
 } from 'paymob-reactnative';
-import { createIntention } from './api/paymob';
+import {
+  createIntention,
+  getTransactionResult,
+  type TransactionResult,
+} from './api/paymob';
 
 // walletii by Ooredoo brand logo, shown in our own header banner (the embedded
 // Paymob element has no merchant name/icon field, so we brand around it).
@@ -48,6 +52,46 @@ function extractSavedCard(details: any): SavedCardInfo | null {
   return null;
 }
 
+// Poll the backend for the authoritative (webhook-sourced) result. Two webhooks
+// arrive independently: TRANSACTION (status) and TOKEN (saved card), with the
+// TOKEN typically a few seconds behind. So we return as soon as a saved card is
+// present, but once the status alone has settled we keep polling for a short
+// grace window to give the TOKEN time to arrive before giving up on the card.
+async function pollBackendResult(
+  reference: string
+): Promise<TransactionResult | null> {
+  const MAX_CYCLES = 14; // ~21s ceiling
+  const GRACE_AFTER_TERMINAL = 5; // ~7.5s extra to wait for the TOKEN
+  const isTerminal = (s?: string) =>
+    s === 'Success' || s === 'Failed' || s === 'Pending';
+
+  let terminalSince = -1;
+  let last: TransactionResult | null = null;
+  for (let i = 0; i < MAX_CYCLES; i++) {
+    try {
+      const r = await getTransactionResult(reference);
+      last = r;
+      if (r.found) {
+        if (r.savedCard) {
+          return r; // best case: status + saved card both present
+        }
+        if (isTerminal(r.status)) {
+          if (terminalSince < 0) {
+            terminalSince = i;
+          }
+          if (i - terminalSince >= GRACE_AFTER_TERMINAL) {
+            return r; // settled, but no card arrived (likely not saved)
+          }
+        }
+      }
+    } catch {
+      // ignore and retry
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+  }
+  return last;
+}
+
 // Inline (embedded) checkout theming. Colors are hex strings.
 //
 // IMPORTANT: the native iOS SDK decodes this JSON with
@@ -64,6 +108,7 @@ const CUSTOMIZATION: Record<string, string> = {
 
 export default function CheckoutScreen() {
   const checkoutRef = useRef<PaymobCheckoutViewRef>(null);
+  const referenceRef = useRef<string | null>(null);
   const [amount, setAmount] = useState<string>('1.500');
   const [loading, setLoading] = useState<boolean>(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -98,8 +143,11 @@ export default function CheckoutScreen() {
 
     setLoading(true);
     try {
-      // Ask our (mock) backend to create the intention and return its secret.
-      const { clientSecret: secret } = await createIntention(amountOmr);
+      // Backend creates the intention (with the secret key) and returns the
+      // client secret plus a reference we use to look up the result later.
+      const { clientSecret: secret, reference } =
+        await createIntention(amountOmr);
+      referenceRef.current = reference;
       setClientSecret(secret);
     } catch (error: any) {
       Alert.alert('Could not start payment', error?.message ?? 'Unknown error');
@@ -109,13 +157,27 @@ export default function CheckoutScreen() {
   };
 
   const reset = () => {
+    referenceRef.current = null;
     setClientSecret(null);
     setAmount('1.500');
   };
 
-  const handleSuccess = (event: any) => {
-    const card = extractSavedCard(event?.nativeEvent);
-    if (card) {
+  const handleSuccess = async (event: any) => {
+    // Prefer the authoritative, webhook-sourced result from the backend; fall
+    // back to the in-app callback payload if the webhook hasn't arrived (e.g.
+    // no public tunnel configured).
+    const reference = referenceRef.current;
+    const backend = reference ? await pollBackendResult(reference) : null;
+    const confirmed = !!backend?.found && backend.status !== 'Created';
+
+    const card =
+      (backend?.savedCard as SavedCardInfo | null | undefined) ??
+      extractSavedCard(event?.nativeEvent);
+    const source = confirmed
+      ? 'confirmed by backend'
+      : 'device (webhook pending)';
+
+    if (card && (card.maskedPan || card.token)) {
       const lines = [
         card.maskedPan ? `Card: ${card.maskedPan}` : null,
         card.cardType ? `Type: ${card.cardType}` : null,
@@ -123,9 +185,12 @@ export default function CheckoutScreen() {
       ]
         .filter(Boolean)
         .join('\n');
-      Alert.alert('Payment successful', `Saved card\n${lines}`);
+      Alert.alert('Payment successful', `Saved card\n${lines}\n\n(${source})`);
     } else {
-      Alert.alert('Payment successful', 'Your payment was completed.');
+      Alert.alert(
+        'Payment successful',
+        `Your payment was completed.\n\n(${source})`
+      );
     }
   };
 
