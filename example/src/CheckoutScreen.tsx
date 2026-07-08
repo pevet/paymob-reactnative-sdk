@@ -22,6 +22,33 @@ import { createIntention } from './api/paymob';
 // Paymob element has no merchant name/icon field, so we brand around it).
 const walletiiLogo = require('./assets/walletii-logo.png');
 
+type SavedCardInfo = {
+  maskedPan?: string;
+  cardType?: string;
+  token?: string;
+};
+
+// A saved card may come back nested (e.g. `savedCard`) or as flat fields, and
+// key casing differs across platforms, so probe the known variants.
+function extractSavedCard(details: any): SavedCardInfo | null {
+  if (!details || typeof details !== 'object') {
+    return null;
+  }
+  const nested =
+    details.savedCard ?? details.saved_card ?? details.savedBankCard;
+  const src = nested && typeof nested === 'object' ? nested : details;
+
+  const maskedPan = src.maskedPan ?? src.maskedPanNumber ?? src.masked_pan;
+  const token = src.token ?? src.cardToken ?? src.card_token;
+  const cardType =
+    src.cardType ?? src.creditCard ?? src.cardSubtype ?? src.card_subtype;
+
+  if (maskedPan || token) {
+    return { maskedPan, cardType, token };
+  }
+  return null;
+}
+
 // Inline (embedded) checkout theming. Colors are hex strings.
 const CUSTOMIZATION: PaymobEmbeddedCustomization = {
   colorPrimary: '#000000', // payment button background
@@ -82,14 +109,27 @@ export default function CheckoutScreen() {
   };
 
   const handleSuccess = (event: any) => {
-    Alert.alert(
-      'Payment successful',
-      JSON.stringify(event.nativeEvent, null, 2)
-    );
+    const card = extractSavedCard(event?.nativeEvent);
+    if (card) {
+      const lines = [
+        card.maskedPan ? `Card: ${card.maskedPan}` : null,
+        card.cardType ? `Type: ${card.cardType}` : null,
+        card.token ? `Token: ${card.token}` : null,
+      ]
+        .filter(Boolean)
+        .join('\n');
+      Alert.alert('Payment successful', `Saved card\n${lines}`);
+    } else {
+      Alert.alert('Payment successful', 'Your payment was completed.');
+    }
   };
 
   const handleFailure = (event: any) => {
-    Alert.alert('Payment failed', event.nativeEvent?.error ?? 'Unknown error');
+    const reason = event?.nativeEvent?.error;
+    Alert.alert(
+      'Payment failed',
+      reason ? `Reason: ${reason}` : 'The payment was rejected.'
+    );
   };
 
   const handlePending = () => {
