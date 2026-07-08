@@ -1,0 +1,5 @@
+
+# Secrets — never commit
+.env
+.env.local
+*.local

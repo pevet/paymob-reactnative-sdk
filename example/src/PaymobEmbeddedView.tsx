@@ -1,3 +1,4 @@
+import Config from 'react-native-config';
 import React, { useEffect, useRef, useState } from 'react';
 import {
     View,
@@ -35,8 +36,8 @@ export default function PaymobEmbeddedView({ onBack }: PaymobEmbeddedViewProps) 
     const [status, setStatus] = useState<string>('');
 
     // Secrets (In real app, fetch these securely)
-    const publicKey = 'omn_pk_test_Ppg36Sfq6GjmmDTZx8Ph300OcqiE1S5x';
-    const clientSecret = 'omn_csk_test_c06fff8f17222edcee283e93736715ea';
+    const publicKey = Config.PAYMOB_PUBLIC_KEY;
+    const clientSecret = Config.PAYMOB_CLIENT_SECRET;
 
     // 1. Initial Configure (Settings only)
     useEffect(() => {

@@ -10245,6 +10245,7 @@ __metadata:
     react: 18.3.1
     react-native: 0.75.4
     react-native-builder-bob: ^0.30.2
+    react-native-config: ^1.6.1
   languageName: unknown
   linkType: soft
 
@@ -10661,6 +10662,20 @@ __metadata:
   bin:
     bob: bin/bob
   checksum: 32b2159559a08310656b6b2f5f591a6aeeb9595f0f2d0e8dff7602af6aa62f59ae7206b023789de0a08f231d747c9bcab19e3efc874fad124b38e40c61f1ec90
+  languageName: node
+  linkType: hard
+
+"react-native-config@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "react-native-config@npm:1.6.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-windows: ">=0.61"
+  peerDependenciesMeta:
+    react-native-windows:
+      optional: true
+  checksum: 356419af35bdc5eed6328c0ada41b49efd5e280d1843ecfb14a37cc37b23c5c28ced038a2ae5ccc9e1d9af324202393f83ad0e1fae4bf0d4ba5798f3c895b8f9
   languageName: node
   linkType: hard
 
