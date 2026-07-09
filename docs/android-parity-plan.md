@@ -154,6 +154,13 @@ still shows the new-card form. The RN bridge passes the configuration correctly
 inside **Paymob's Android SDK 1.9.2**, which does not honor these embedded
 `configure(...)` parameters. The iOS SDK applies the identical configuration.
 
-Decision: ship Android with default embedded theming for now and raise the issue
-with Paymob. Details and a ready-to-file report:
+A second Android SDK issue surfaced during testing: the embedded checkout
+**intermittently crashes** ~1–2s after `setPaymentKeys` with a
+`NullPointerException` in `PaymobCheckoutView.getBinding()` — the SDK's
+intention-retrieval state emission reads the view binding after the hosting RN
+view has transiently detached it. It's a race (the same flow often renders
+cleanly), and it's SDK-internal.
+
+Decision: ship Android with default embedded theming for now and raise both
+issues with Paymob. Details and a ready-to-file report:
 [`docs/paymob-android-sdk-issue.md`](paymob-android-sdk-issue.md).

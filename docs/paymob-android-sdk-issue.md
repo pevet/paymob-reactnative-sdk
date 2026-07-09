@@ -1,7 +1,16 @@
-# Paymob Android SDK — embedded `uiCustomization` and `showAddNewCard` not applied
+# Paymob Android SDK — embedded checkout issues (1.9.2)
 
-A ready-to-file report for Paymob support / the `Paymob-SDK` Android maintainers.
-The iOS SDK applies the same configuration correctly; only Android is affected.
+A ready-to-file report for Paymob support / the `Paymob-SDK` Android maintainers,
+covering two issues with the embedded `PaymobCheckoutView`:
+
+1. `uiCustomization` and `showAddNewCard` are not applied (below).
+2. An intermittent `NullPointerException` crash during intention retrieval
+   ([Issue 2](#issue-2--intermittent-nullpointerexception-during-intention-retrieval)).
+
+The iOS SDK applies the same configuration correctly and does not crash; only
+Android is affected.
+
+## Issue 1 — `uiCustomization` / `showAddNewCard` not applied
 
 ## Environment
 
@@ -92,10 +101,54 @@ intention, same flow.
   `configure(...)` call site (see log above).
 - Not activity context — `currentActivity` is a non-null `ComponentActivity`.
 
+## Issue 2 — intermittent `NullPointerException` during intention retrieval
+
+Entering the embedded checkout intermittently crashes the app ~1–2 seconds
+after `setPaymentKeys(...)`, i.e. when the intention finishes loading. It is a
+race: the same flow often renders fine, but crashes on some attempts.
+
+### Stack trace
+
+```
+FATAL EXCEPTION: main
+Process: <app>, PID: ####
+java.lang.NullPointerException
+    at com.paymob.paymob_sdk.ui.embedded.PaymobCheckoutView.getBinding(PaymobCheckoutView.kt:66)
+    at com.paymob.paymob_sdk.ui.embedded.PaymobCheckoutView.access$getBinding(PaymobCheckoutView.kt:48)
+    at com.paymob.paymob_sdk.ui.embedded.PaymobCheckoutView$observeStates$2$1.emit(PaymobCheckoutView.kt:150)
+    at com.paymob.paymob_sdk.ui.embedded.PaymobCheckoutView$observeStates$2$1.emit(PaymobCheckoutView.kt:135)
+    at kotlinx.coroutines.flow.StateFlowImpl.collect(StateFlow.kt:401)
+    ...
+    at com.paymob.paymob_sdk.ui.embedded.PaymobCheckoutViewModel$retrieveIntention$1.invokeSuspend(PaymobCheckoutViewModel.kt:30)
+```
+
+### Diagnosis
+
+`retrieveIntention` emits a state; the `observeStates` collector then reads
+`getBinding()` (`PaymobCheckoutView.kt:66`), which returns null — the view's
+`ViewBinding` has already been cleared (view detached from window) by the time
+the asynchronous emission arrives. The state collection is not cancelled when the
+view detaches, and/or `getBinding()` is dereferenced without a null check.
+
+### Impact & likely cause
+
+The embedded `PaymobCheckoutView` is hosted inside a React Native view tree,
+which attaches/detaches and re-lays-out children during normal operation. When
+the intention result is emitted during a transient detach, the collector
+dereferences a null binding and the process is killed.
+
+### Suggested fix (SDK side)
+
+- Cancel the `observeStates` collection when the view detaches
+  (`onDetachedFromWindow`) / tie it to the view's lifecycle, and/or
+- null-check the binding in the collector before use.
+
 ## Questions for Paymob
 
 1. Are `uiCustomization` and `showAddNewCard` supported on the embedded
    `PaymobCheckoutView` in 1.9.2, and in what call order relative to
    `setPaymentKeys`?
 2. Is there a newer `Paymob-SDK` version where embedded customization/scoping is
-   honored on Android?
+   honored and the intention-retrieval crash is fixed on Android?
+3. Is the embedded `PaymobCheckoutView` supported when hosted in a view tree that
+   may detach/reattach it (e.g. React Native), given the `getBinding()` NPE above?
