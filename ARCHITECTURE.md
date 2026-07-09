@@ -12,15 +12,22 @@ truth** for the transaction result and the saved card.
 
 The app opens on a flow selector with two options:
 
-- **Embedded checkout** — Paymob's native element handles card entry and saved
-  cards. Simple, but Paymob controls the saved-card order.
-- **Saved cards (app-driven)** — the app renders its own ordered, selectable
-  saved-card list (plus a "New card" option) and charges the chosen token
-  headlessly, hosting the 3-D Secure challenge in a WebView. Full control of the
-  list and order.
+- **Embedded checkout** — the intention offers all saved cards; Paymob's native
+  element renders them (in Paymob's own order) plus a new-card form.
+- **Saved cards (app-driven)** — the app renders its own ordered, single-select
+  saved-card list (plus a "New card" option). The chosen card **scopes the
+  intention** (`card_tokens = [that token]`), so the embedded element opens
+  showing **only that card** and collects its CVV. This honours the user's
+  selection/order while keeping CVV + 3-D Secure inside Paymob's UI.
 
 Both share the top-up screen (amount, quick-add chips, saved-card list, redirect
 checkbox) and the same webhook + result-poll plumbing.
+
+> A truly headless token charge (no Paymob UI) was prototyped but isn't viable
+> on this integration: Paymob's `payments/pay` requires the card's CVV/CSC and
+> won't accept it outside its own UI (a no-CVV charge needs a MOTO integration).
+> So both flows go through the embedded element; the app-driven flow just scopes
+> it to the selected card.
 
 ## Embedded checkout flow
 
@@ -66,35 +73,36 @@ also flow into the next intention's card tokens.
 
 ## App-driven saved-card flow
 
-The app charges a chosen saved-card token itself and hosts 3-D Secure, so the
-Paymob element (and its saved-card ordering) is bypassed. Selecting "New card"
-falls back to the embedded flow above.
+The app owns the selection UI (ordered, single-select list + "New card"), then
+scopes the intention to the chosen card so the embedded element shows only that
+card and collects its CVV. Selecting "New card" scopes the intention to no saved
+cards, so the element shows the new-card form.
 
 ```mermaid
 sequenceDiagram
     participant App as Mobile app (RN, iOS)
     participant BE as Backend (Express)
     participant PM as Paymob (Oman)
-    App->>BE: 1. POST /pay-saved {amount, token}
-    BE->>PM: 2. create intention -> payment_token
-    BE->>PM: 3. payments/pay {source: TOKEN, payment_token}
-    PM-->>BE: 4. pending + 3-D Secure redirection_url
-    BE-->>App: 5. { reference, redirectionUrl }
-    App->>PM: 6. open redirection_url in a WebView (3-D Secure)
-    PM->>BE: 7. webhook: TRANSACTION + TOKEN (via cloudflared tunnel)
-    App->>BE: 8. poll GET /tx/:reference -> status + saved card
+    Note over App: user picks a saved card (or "New card")
+    App->>BE: 1. POST /intentions {amount, cardTokens: [chosen] | []}
+    BE->>PM: 2. create intention (secret key, scoped card_tokens)
+    PM-->>BE: 3. client_secret
+    BE-->>App: 4. clientSecret + reference
+    App->>PM: 5. embedded checkout scoped to the chosen card: CVV + 3-D Secure
+    PM->>BE: 6. webhook: TRANSACTION (+ TOKEN) via cloudflared tunnel
+    App->>BE: 7. poll GET /tx/:reference -> status + saved card
 ```
 
-Why this is needed: Paymob re-sorts saved cards by its own rule and ignores the
-`card_tokens` order, so the only way to honour a user-chosen order (and
-selection) is to drive the payment from the app. Uses a standard integration, so
-3-D Secure still applies (customer-present).
+Why scoping (not a headless charge): Paymob re-sorts saved cards by its own rule
+and ignores the `card_tokens` order, so honouring a user-chosen selection means
+the app must decide the card. Scoping the intention to one token makes the
+element display just that card, keeping CVV/3-D Secure inside Paymob's UI.
 
 ## Components
 
 | Component | Role | Responsibility |
 | --- | --- | --- |
-| Mobile app | Client | Flow selection, amount entry, saved-card list (select/edit/reorder), embedded checkout or 3-D Secure WebView, result popup. |
+| Mobile app | Client | Flow selection, amount entry, saved-card list (select/edit/reorder), embedded checkout (scoped per selection), result popup. |
 | Backend (`example/server`) | Server | Holds the secret key; creates intentions; receives webhooks; persists cards; serves the result poll. |
 | Paymob | Provider | Oman intention API + embedded checkout; sends the authoritative callbacks. |
 | `saved-cards.json` | Store | Persists saved-card tokens across restarts (gitignored — holds PII). |
@@ -121,8 +129,7 @@ selection) is to drive the payment from the app. Uses a standard integration, so
 
 | Endpoint | Purpose |
 | --- | --- |
-| `POST /intentions` | Embedded flow: create the intention (secret key + `card_tokens`); returns `clientSecret`, `reference`, `savedCards`. |
-| `POST /pay-saved` | App-driven flow: create an intention then charge a saved token; returns a 3-D Secure `redirectionUrl`. |
+| `POST /intentions` | Create the intention (secret key). Optional `cardTokens` scopes the offered cards: all (omit), `[token]` (one), or `[]` (none). Returns `clientSecret`, `reference`, `savedCards`. |
 | `POST /paymob/webhook` | Paymob's `notification_url`; captures the `TRANSACTION` result and `TOKEN` saved card. |
 | `GET /tx/:reference` | The result the app polls: status plus saved card. |
 | `GET /saved-cards` | Lists the cards persisted from token callbacks. |
