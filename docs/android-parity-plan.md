@@ -3,7 +3,7 @@
 |          |                          |
 | -------- | ------------------------ |
 | Document | PLAN-001                 |
-| Status   | Approved — not started   |
+| Status   | Implemented & verified — one SDK-side limitation (see Outcome) |
 | Goal     | Android runs both payment flows at feature parity with iOS |
 
 > Scope: the demo in [`example/`](../example). The published SDK's native
@@ -114,9 +114,46 @@ platform-specific JS details, not native code.
 
 ## Risks & notes
 
-- **JDK 17** is a hard prerequisite; the machine currently has JDK 15.
+- **JDK 17** is a hard prerequisite; the machine originally had JDK 15.
 - The x86 AVD will be slow on Apple Silicon; an arm64 image is worth the setup.
-- `network_security_config` must stay **debug-only** so release builds keep
-  cleartext disabled.
+- The `src/debug` manifest already enables `usesCleartextTraffic` for debug
+  builds, so no extra network-security config is needed (and it stays debug-only
+  so release builds keep cleartext disabled).
 - Android drag-to-reorder (embedded flow) uses `PanResponder` + `Animated` —
   already cross-platform, but worth a specific check on a touch device.
+
+## Outcome
+
+Implemented via commits on `main` (app wiring + manual react-native-config
+linking) and verified on an Android emulator (Pixel API 35, arm64) with the full
+stack running.
+
+**Verified working on Android (parity with iOS):**
+
+- Debug build + launch (JDK 17, SDK 35, build-tools 35).
+- `Config.*` populated from `.env` (via the manual react-native-config link).
+- App → backend over `http://10.0.2.2:3000`; `getSavedCards` and
+  `createIntention` both round-trip.
+- Flow selector, top-up screen, amount entry + live balance, quick-add chips,
+  rial glyph, consent gating.
+- Saved-card **dropdown** (select / ✓ / edit) and the cross-platform **rename
+  modal** that replaced the iOS-only `Alert.prompt`.
+
+**Toolchain installed on the dev machine:** JDK 17 (`brew openjdk@17`), Android
+SDK platform 35 + build-tools 35 + platform-tools, command-line tools, the
+emulator, and an arm64 AVD (`rn_pixel_api35`).
+
+### Known limitation — embedded checkout theming/scoping (SDK-side)
+
+On Android the embedded element renders with **default** styling and ignores
+`showAddNewCard`: the pay button stays the default blue "Pay" (not the themed
+"Continue"), the container color isn't applied, and a saved-card-scoped intention
+still shows the new-card form. The RN bridge passes the configuration correctly
+(confirmed at the `configure(...)` call site: `uiCustomization` non-null,
+`showAddNewCard=false`), and no parse error or exception occurs — so this is
+inside **Paymob's Android SDK 1.9.2**, which does not honor these embedded
+`configure(...)` parameters. The iOS SDK applies the identical configuration.
+
+Decision: ship Android with default embedded theming for now and raise the issue
+with Paymob. Details and a ready-to-file report:
+[`docs/paymob-android-sdk-issue.md`](paymob-android-sdk-issue.md).
