@@ -12,35 +12,6 @@ const BACKEND_URL = (
   Config.PAYMOB_BACKEND_URL ?? 'http://localhost:3000'
 ).replace(/\/$/, '');
 
-export interface PaySavedResult {
-  reference: string;
-  transactionId: number | null;
-  pending: boolean;
-  success: boolean;
-  /** Present when the card needs a 3-D Secure challenge (open in a WebView). */
-  redirectionUrl: string | null;
-}
-
-/**
- * App-driven flow: charge a specific saved-card token for the given amount.
- * Returns a 3-D Secure `redirectionUrl` when a challenge is required.
- */
-export async function paySaved(
-  amountOmr: number,
-  token: string
-): Promise<PaySavedResult> {
-  const response = await fetch(`${BACKEND_URL}/pay-saved`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount: amountOmr, token }),
-  });
-  const text = await response.text();
-  if (!response.ok) {
-    throw new Error(`Pay failed (${response.status}): ${text.slice(0, 300)}`);
-  }
-  return JSON.parse(text) as PaySavedResult;
-}
-
 export interface SavedCard {
   token?: string;
   maskedPan?: string;
@@ -117,14 +88,22 @@ export interface CreateIntentionResult {
  * Returns the client secret used to initialise the SDK, a reference the app
  * uses to look up the authoritative result later, and the saved cards known to
  * the backend.
+ *
+ * `cardTokens` scopes which saved cards the checkout offers: omit for all,
+ * `[token]` for just that card, or `[]` for none (new card only).
  */
 export async function createIntention(
-  amountOmr: number
+  amountOmr: number,
+  cardTokens?: string[]
 ): Promise<CreateIntentionResult> {
   const response = await fetch(`${BACKEND_URL}/intentions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount: amountOmr }),
+    body: JSON.stringify(
+      cardTokens === undefined
+        ? { amount: amountOmr }
+        : { amount: amountOmr, cardTokens }
+    ),
   });
   const text = await response.text();
   if (!response.ok) {

@@ -6,7 +6,6 @@ import {
   Animated,
   Button,
   Image,
-  Modal,
   PanResponder,
   ScrollView,
   StyleSheet,
@@ -15,7 +14,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { WebView } from 'react-native-webview';
 import {
   PaymobCheckoutView,
   type PaymobCheckoutViewRef,
@@ -25,7 +23,6 @@ import {
   deleteSavedCard,
   getSavedCards,
   getTransactionResult,
-  paySaved,
   reorderSavedCards,
   updateSavedCard,
   type SavedCard,
@@ -170,7 +167,6 @@ export default function CheckoutScreen() {
   const [selected, setSelected] = useState<Selection>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [threeDsUrl, setThreeDsUrl] = useState<string | null>(null);
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
 
   // Accepts '.' or ',' as the decimal separator regardless of device locale.
@@ -183,20 +179,23 @@ export default function CheckoutScreen() {
   const publicKey = Config.PAYMOB_PUBLIC_KEY ?? '';
 
   // Once we have a client secret the checkout mounts; configure it, then set the
-  // keys to load the payment form.
+  // keys to load the payment form. When the app-driven flow scoped the intention
+  // to one saved card, hide the "add new card" form so only that card shows.
+  const scopedToSavedCard =
+    flow === 'saved' && !!selected && selected !== 'new';
   useEffect(() => {
     if (!clientSecret) {
       return;
     }
     checkoutRef.current?.configure({
       uiCustomization: JSON.stringify(CUSTOMIZATION),
-      showAddNewCard: true,
+      showAddNewCard: !scopedToSavedCard,
       showSaveCard: true,
       saveCardByDefault: false,
       payFromOutside: false,
     });
     checkoutRef.current?.setPaymentKeys({ publicKey, clientSecret });
-  }, [clientSecret, publicKey]);
+  }, [clientSecret, publicKey, scopedToSavedCard]);
 
   // Load saved cards whenever we're on the top-up screen (not the element).
   useEffect(() => {
@@ -222,46 +221,9 @@ export default function CheckoutScreen() {
     };
   }, [screen, clientSecret, flow]);
 
-  // While the 3-D Secure WebView is open, poll for the authoritative result and
-  // close it once the transaction settles.
-  useEffect(() => {
-    if (!threeDsUrl) {
-      return;
-    }
-    const reference = referenceRef.current;
-    let active = true;
-    (async () => {
-      while (active && reference) {
-        try {
-          const r = await getTransactionResult(reference);
-          if (
-            r.found &&
-            (r.status === 'Success' ||
-              r.status === 'Failed' ||
-              r.status === 'Pending')
-          ) {
-            if (active) {
-              setThreeDsUrl(null);
-              showResult(r.status, r.savedCard ?? null, 'confirmed by backend');
-              goToSelect();
-            }
-            return;
-          }
-        } catch {
-          // ignore and keep polling
-        }
-        await new Promise((resolve) => setTimeout(resolve, 2500));
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, [threeDsUrl]);
-
   const goToSelect = () => {
     referenceRef.current = null;
     setClientSecret(null);
-    setThreeDsUrl(null);
     setSelected(null);
     setAmountText('');
     setAgreed(false);
@@ -276,10 +238,16 @@ export default function CheckoutScreen() {
     setScreen('topup');
   };
 
-  const startEmbedded = async () => {
+  // Open the embedded checkout. `cardTokens` scopes which saved cards it shows:
+  // undefined = all (embedded flow), [token] = only that card (saved flow), and
+  // [] = new card only.
+  const startEmbedded = async (cardTokens?: string[]) => {
     setLoading(true);
     try {
-      const { clientSecret: secret, reference } = await createIntention(amount);
+      const { clientSecret: secret, reference } = await createIntention(
+        amount,
+        cardTokens
+      );
       referenceRef.current = reference;
       setClientSecret(secret);
     } catch (error: any) {
@@ -289,33 +257,15 @@ export default function CheckoutScreen() {
     }
   };
 
-  const payWithSavedCard = async (token: string) => {
-    setLoading(true);
-    try {
-      const res = await paySaved(amount, token);
-      referenceRef.current = res.reference;
-      if (res.redirectionUrl) {
-        setThreeDsUrl(res.redirectionUrl); // 3-D Secure challenge
-      } else {
-        const r = await pollBackendResult(res.reference);
-        showResult(r?.status, r?.savedCard ?? null, 'confirmed by backend');
-        goToSelect();
-      }
-    } catch (error: any) {
-      Alert.alert('Payment failed', error?.message ?? 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleContinue = () => {
     if (!canContinue) {
       return;
     }
-    if (flow === 'saved' && selected && selected !== 'new') {
-      payWithSavedCard(selected);
+    if (flow === 'saved') {
+      // Scope the checkout to the chosen saved card, or to a new card only.
+      startEmbedded(selected && selected !== 'new' ? [selected] : []);
     } else {
-      startEmbedded(); // embedded flow, or "new card" in the saved flow
+      startEmbedded(); // embedded flow: all saved cards
     }
   };
 
@@ -716,24 +666,6 @@ export default function CheckoutScreen() {
           <Text style={styles.continueText}>Continue</Text>
         )}
       </TouchableOpacity>
-
-      <Modal
-        visible={!!threeDsUrl}
-        animationType="slide"
-        onRequestClose={() => setThreeDsUrl(null)}
-      >
-        <View style={styles.webviewContainer}>
-          <View style={styles.webviewHeader}>
-            <Text style={styles.webviewTitle}>Secure payment</Text>
-            <TouchableOpacity onPress={() => setThreeDsUrl(null)}>
-              <Text style={styles.webviewClose}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-          {threeDsUrl && (
-            <WebView source={{ uri: threeDsUrl }} style={styles.webview} />
-          )}
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -1082,34 +1014,5 @@ const styles = StyleSheet.create({
   },
   resetButton: {
     marginTop: 8,
-  },
-
-  // 3-D Secure WebView
-  webviewContainer: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  webviewHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 54,
-    paddingBottom: 12,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  webviewTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#111111',
-  },
-  webviewClose: {
-    fontSize: 16,
-    color: '#0b8f83',
-    fontWeight: '600',
-  },
-  webview: {
-    flex: 1,
   },
 });
