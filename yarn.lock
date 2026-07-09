@@ -7219,7 +7219,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"invariant@npm:2.2.4, invariant@npm:^2.2.4":
+"invariant@npm:^2.2.4":
   version: 2.2.4
   resolution: "invariant@npm:2.2.4"
   dependencies:
@@ -10246,7 +10246,6 @@ __metadata:
     react-native: 0.75.4
     react-native-builder-bob: ^0.30.2
     react-native-config: ^1.6.1
-    react-native-webview: ^14.0.1
   languageName: unknown
   linkType: soft
 
@@ -10677,19 +10676,6 @@ __metadata:
     react-native-windows:
       optional: true
   checksum: 356419af35bdc5eed6328c0ada41b49efd5e280d1843ecfb14a37cc37b23c5c28ced038a2ae5ccc9e1d9af324202393f83ad0e1fae4bf0d4ba5798f3c895b8f9
-  languageName: node
-  linkType: hard
-
-"react-native-webview@npm:^14.0.1":
-  version: 14.0.1
-  resolution: "react-native-webview@npm:14.0.1"
-  dependencies:
-    escape-string-regexp: ^4.0.0
-    invariant: 2.2.4
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 79936364b8404240d30ca37530910673994ceb4f21e2ce1f9cd3042167e5cd6f52b4e001831d827bf0d5198fab25fcd089e286198d4af8ad962b8a1150f0dc77
   languageName: node
   linkType: hard
 
