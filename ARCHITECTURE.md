@@ -44,6 +44,12 @@ sequenceDiagram
 7. **App → Backend** — the app polls `GET /tx/:reference` for the confirmed
    status and saved card, then shows the result labelled "confirmed by backend".
 
+The top-up screen also lists the saved cards and lets the user **rename** each
+one (a nickname is shown in place of the card type), **delete** it, or
+**drag to reorder** the list; those changes are persisted through
+`PATCH` / `DELETE /saved-cards/:token` and `PUT /saved-cards/order`, so they
+also flow into the next intention's card tokens.
+
 ## Components
 
 | Component | Role | Responsibility |
@@ -79,6 +85,9 @@ sequenceDiagram
 | `POST /paymob/webhook` | Paymob's `notification_url`; captures the `TRANSACTION` result and `TOKEN` saved card. |
 | `GET /tx/:reference` | The result the app polls: status plus saved card. |
 | `GET /saved-cards` | Lists the cards persisted from token callbacks. |
+| `PATCH /saved-cards/:token` | Set or clear a card's nickname. |
+| `DELETE /saved-cards/:token` | Remove a saved card. |
+| `PUT /saved-cards/order` | Set the display order (array of tokens). |
 
 ## Not production
 

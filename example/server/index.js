@@ -12,6 +12,8 @@
  *                                                 shopper opted to save the card)
  *   3. GET  /tx/:reference        The app polls this for the result + saved card.
  *   4. GET  /saved-cards          Lists saved cards persisted from TOKEN callbacks.
+ *   5. PATCH/DELETE /saved-cards/:token  Rename (nickname) or remove a card.
+ *   6. PUT  /saved-cards/order    Set the display order (array of tokens).
  *
  * Transaction results are held in-memory (a Map) to keep the demo minimal;
  * saved cards are also persisted to a local JSON file so tokens survive
@@ -59,27 +61,42 @@ function loadSavedCards() {
 
 const savedCards = loadSavedCards(); // token -> record
 
-function persistSavedCard(record) {
-  if (!record || !record.token) {
-    return;
-  }
-  savedCards[record.token] = record;
+function writeSavedCards() {
   try {
     fs.writeFileSync(SAVED_CARDS_FILE, JSON.stringify(savedCards, null, 2));
-    console.log(
-      `[saved-cards] persisted token=${record.token.slice(0, 8)}… (${Object.keys(savedCards).length} total)`
-    );
   } catch (err) {
     console.error('[saved-cards] write failed', err);
   }
 }
 
-// All persisted saved cards, most recent first. (Demo-global: there is no
-// customer auth here, so every persisted card is returned.)
-function listSavedCards() {
-  return Object.values(savedCards).sort((a, b) =>
-    String(b.receivedAt).localeCompare(String(a.receivedAt))
+function persistSavedCard(record) {
+  if (!record || !record.token) {
+    return;
+  }
+  const existing = savedCards[record.token];
+  // Preserve a user-set nickname and manual order if the card is re-tokenized.
+  savedCards[record.token] = {
+    ...record,
+    nickname: existing?.nickname ?? null,
+    order: existing?.order ?? null,
+  };
+  writeSavedCards();
+  console.log(
+    `[saved-cards] persisted token=${record.token.slice(0, 8)}… (${Object.keys(savedCards).length} total)`
   );
+}
+
+// Saved cards in display order: cards with a manual order first (ascending),
+// then any others by most-recent. (Demo-global: no customer auth here.)
+function listSavedCards() {
+  return Object.values(savedCards).sort((a, b) => {
+    const ao = a.order;
+    const bo = b.order;
+    if (ao != null && bo != null) return ao - bo;
+    if (ao != null) return -1;
+    if (bo != null) return 1;
+    return String(b.receivedAt).localeCompare(String(a.receivedAt));
+  });
 }
 
 const app = express();
@@ -261,6 +278,45 @@ app.get('/tx/:reference', (req, res) => {
 // All persisted saved cards (most recent first).
 app.get('/saved-cards', (_req, res) => {
   res.json(listSavedCards());
+});
+
+// Set (or clear) a saved card's nickname.
+app.patch('/saved-cards/:token', (req, res) => {
+  const card = savedCards[req.params.token];
+  if (!card) {
+    return res.status(404).json({ error: 'card not found' });
+  }
+  const raw = req.body?.nickname;
+  card.nickname = typeof raw === 'string' && raw.trim() ? raw.trim() : null;
+  writeSavedCards();
+  console.log(
+    `[saved-cards] renamed token=${req.params.token.slice(0, 8)}… -> ${card.nickname ?? '(cleared)'}`
+  );
+  res.json(card);
+});
+
+// Set the display order of saved cards (array of tokens, top to bottom).
+app.put('/saved-cards/order', (req, res) => {
+  const tokens = Array.isArray(req.body?.tokens) ? req.body.tokens : [];
+  tokens.forEach((tok, i) => {
+    if (savedCards[tok]) {
+      savedCards[tok].order = i;
+    }
+  });
+  writeSavedCards();
+  console.log(`[saved-cards] reordered (${tokens.length} tokens)`);
+  res.json(listSavedCards());
+});
+
+// Delete a saved card.
+app.delete('/saved-cards/:token', (req, res) => {
+  if (!savedCards[req.params.token]) {
+    return res.status(404).json({ error: 'card not found' });
+  }
+  delete savedCards[req.params.token];
+  writeSavedCards();
+  console.log(`[saved-cards] deleted token=${req.params.token.slice(0, 8)}…`);
+  res.json({ ok: true });
 });
 
 app.get('/', (_req, res) =>
