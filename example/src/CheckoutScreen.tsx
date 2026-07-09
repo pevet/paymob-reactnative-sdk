@@ -9,7 +9,6 @@ import {
   Modal,
   PanResponder,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -535,11 +534,7 @@ export default function CheckoutScreen() {
             resizeMode="contain"
           />
         </View>
-        <ScrollView
-          style={styles.container}
-          contentContainerStyle={styles.checkoutContent}
-          keyboardShouldPersistTaps="handled"
-        >
+        <View style={[styles.container, styles.checkoutContent]}>
           <PaymobCheckoutView
             ref={checkoutRef}
             style={styles.embedded}
@@ -550,7 +545,7 @@ export default function CheckoutScreen() {
           <View style={styles.resetButton}>
             <Button title="Start over" onPress={goToSelect} color="#888888" />
           </View>
-        </ScrollView>
+        </View>
         <ProcessingModal visible={processing} />
       </View>
     );

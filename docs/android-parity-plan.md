@@ -161,6 +161,14 @@ intention-retrieval state emission reads the view binding after the hosting RN
 view has transiently detached it. It's a race (the same flow often renders
 cleanly), and it's SDK-internal.
 
+**Mitigation applied (app-side):** the embedded checkout is now hosted in a plain
+`View` instead of a `ScrollView`. The `ScrollView` re-measured its content every
+time the auto-sizing wrapper pushed a new height, and that churn was the main
+trigger for the transient detach behind the crash. After the change the crash did
+not reproduce in 22 consecutive runs (vs. roughly 1-in-4 before), with rendering
+intact. This narrows the race but cannot fully eliminate an SDK-internal crash —
+a proper fix still needs the SDK change described in the report.
+
 A version bump was investigated and is **not available**: 1.9.2 is the latest
 embedded Android SDK Paymob ships (both the upstream RN SDK and the Flutter SDK
 pin `com.paymob.sdk:Paymob-SDK:1.9.2`, and it isn't on Maven Central or JitPack).
