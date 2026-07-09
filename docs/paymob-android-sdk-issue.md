@@ -10,6 +10,12 @@ covering two issues with the embedded `PaymobCheckoutView`:
 The iOS SDK applies the same configuration correctly and does not crash; only
 Android is affected.
 
+**Version note:** 1.9.2 is the latest embedded Android SDK Paymob ships — the
+upstream React Native SDK (vendored 2026-06-16) and the Flutter SDK (updated
+2026-07-04) both depend on `com.paymob.sdk:Paymob-SDK:1.9.2`, and the artifact is
+not published to Maven Central or JitPack (both 404). So there is no newer
+version to upgrade to; both issues need a fix in a future Paymob release.
+
 ## Issue 1 — `uiCustomization` / `showAddNewCard` not applied
 
 ## Environment

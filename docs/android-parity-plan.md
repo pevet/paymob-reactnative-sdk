@@ -161,6 +161,11 @@ intention-retrieval state emission reads the view binding after the hosting RN
 view has transiently detached it. It's a race (the same flow often renders
 cleanly), and it's SDK-internal.
 
+A version bump was investigated and is **not available**: 1.9.2 is the latest
+embedded Android SDK Paymob ships (both the upstream RN SDK and the Flutter SDK
+pin `com.paymob.sdk:Paymob-SDK:1.9.2`, and it isn't on Maven Central or JitPack).
+So both issues need a fix in a future Paymob release.
+
 Decision: ship Android with default embedded theming for now and raise both
 issues with Paymob. Details and a ready-to-file report:
 [`docs/paymob-android-sdk-issue.md`](paymob-android-sdk-issue.md).
