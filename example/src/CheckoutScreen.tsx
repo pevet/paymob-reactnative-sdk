@@ -184,6 +184,7 @@ export default function CheckoutScreen() {
   const [processing, setProcessing] = useState<boolean>(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
+  const [pickerOpen, setPickerOpen] = useState<boolean>(false);
 
   // Accepts '.' or ',' as the decimal separator regardless of device locale.
   const amount = parseFloat(amountText.replace(',', '.')) || 0;
@@ -241,6 +242,7 @@ export default function CheckoutScreen() {
     referenceRef.current = null;
     setClientSecret(null);
     setSelected(null);
+    setPickerOpen(false);
     setAmountText('');
     setAgreed(false);
     setScreen('select');
@@ -249,9 +251,16 @@ export default function CheckoutScreen() {
   const chooseFlow = (f: Flow) => {
     setFlow(f);
     setSelected(null);
+    setPickerOpen(false);
     setAmountText('');
     setAgreed(false);
     setScreen('topup');
+  };
+
+  // Choose a saved card (or "New card") from the dropdown and close it.
+  const pickCard = (sel: Selection) => {
+    setSelected(sel);
+    setPickerOpen(false);
   };
 
   // Open the embedded checkout. `cardTokens` scopes which saved cards it shows:
@@ -531,6 +540,7 @@ export default function CheckoutScreen() {
 
   // ---- Top-up screen -------------------------------------------------------
   const showCards = flow === 'saved' || savedCards.length > 0;
+  const selectedCard = savedCards.find((c) => c.token === selected) ?? null;
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
@@ -590,19 +600,112 @@ export default function CheckoutScreen() {
             <Text style={styles.savedCardsTitle}>
               {flow === 'saved' ? 'Pay with' : 'Saved cards'}
             </Text>
-            {savedCards.length > 1 && (
+            {flow === 'embedded' && savedCards.length > 1 && (
               <Text style={styles.savedCardsHint}>≡ drag to reorder</Text>
             )}
           </View>
 
-          {savedCards.map((c, i) => {
-            const isSelected = flow === 'saved' && selected === c.token;
-            return (
+          {flow === 'saved' ? (
+            // App-driven flow: a dropdown whose closed state shows the selected
+            // card; tapping it reveals the saved cards plus a "New card" option.
+            <View>
+              <TouchableOpacity
+                style={[
+                  styles.dropdownTrigger,
+                  pickerOpen && styles.dropdownTriggerOpen,
+                ]}
+                activeOpacity={0.7}
+                onPress={() => setPickerOpen((o) => !o)}
+                accessibilityRole="button"
+                accessibilityLabel="Select a card to pay with"
+              >
+                <View style={styles.savedCardLeft}>
+                  {selected === 'new' ? (
+                    <Text style={styles.newCardText}>+ New card</Text>
+                  ) : selectedCard ? (
+                    <>
+                      <CardBrandIcon type={selectedCard.cardType} />
+                      <Text style={styles.savedCardType} numberOfLines={1}>
+                        {selectedCard.nickname ||
+                          selectedCard.cardType ||
+                          'Card'}
+                      </Text>
+                      <Text style={styles.savedCardPan}>
+                        {last4(selectedCard.maskedPan)}
+                      </Text>
+                    </>
+                  ) : (
+                    <Text style={styles.dropdownPlaceholder}>
+                      Select a card
+                    </Text>
+                  )}
+                </View>
+                <Text style={styles.caret}>{pickerOpen ? '▲' : '▾'}</Text>
+              </TouchableOpacity>
+
+              {pickerOpen && (
+                <View style={styles.dropdownPanel}>
+                  {savedCards.map((c, i) => {
+                    const isSel = selected === c.token;
+                    return (
+                      <View
+                        key={c.token ?? String(i)}
+                        style={[
+                          styles.dropdownOption,
+                          isSel && styles.rowSelected,
+                        ]}
+                      >
+                        <TouchableOpacity
+                          style={styles.savedCardLeft}
+                          activeOpacity={0.7}
+                          onPress={() => pickCard(c.token ?? null)}
+                        >
+                          <CardBrandIcon type={c.cardType} />
+                          <Text style={styles.savedCardType} numberOfLines={1}>
+                            {c.nickname || c.cardType || 'Card'}
+                          </Text>
+                        </TouchableOpacity>
+                        <View style={styles.savedCardRight}>
+                          <Text style={styles.savedCardPan}>
+                            {last4(c.maskedPan)}
+                          </Text>
+                          {isSel && <Text style={styles.optionCheck}>✓</Text>}
+                          <TouchableOpacity
+                            style={styles.editBtn}
+                            onPress={() => openEditCard(c)}
+                            accessibilityLabel="Edit card"
+                          >
+                            <Text style={styles.editIcon}>✎</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    );
+                  })}
+                  <TouchableOpacity
+                    style={[
+                      styles.dropdownOption,
+                      styles.dropdownOptionLast,
+                      selected === 'new' && styles.rowSelected,
+                    ]}
+                    activeOpacity={0.7}
+                    onPress={() => pickCard('new')}
+                  >
+                    <Text style={styles.newCardText}>+ New card</Text>
+                    {selected === 'new' && (
+                      <Text style={styles.optionCheck}>✓</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          ) : (
+            // Embedded flow: an informational list of the cards Paymob will
+            // offer, with rename/delete and drag-to-reorder.
+            savedCards.map((c, i) => (
               <Animated.View
                 key={c.token ?? String(i)}
                 style={[
                   styles.savedCardRow,
-                  isSelected && styles.rowSelected,
                   i === dragIndex && {
                     transform: [{ translateY: dragY }],
                     zIndex: 10,
@@ -614,22 +717,12 @@ export default function CheckoutScreen() {
                   },
                 ]}
               >
-                <TouchableOpacity
-                  style={styles.savedCardLeft}
-                  activeOpacity={0.7}
-                  disabled={flow !== 'saved'}
-                  onPress={() => setSelected(c.token ?? null)}
-                >
-                  {flow === 'saved' && (
-                    <View style={[styles.radio, isSelected && styles.radioOn]}>
-                      {isSelected && <View style={styles.radioDot} />}
-                    </View>
-                  )}
+                <View style={styles.savedCardLeft}>
                   <CardBrandIcon type={c.cardType} />
                   <Text style={styles.savedCardType} numberOfLines={1}>
                     {c.nickname || c.cardType || 'Card'}
                   </Text>
-                </TouchableOpacity>
+                </View>
                 <View style={styles.savedCardRight}>
                   <Text style={styles.savedCardPan}>{last4(c.maskedPan)}</Text>
                   <TouchableOpacity
@@ -650,27 +743,7 @@ export default function CheckoutScreen() {
                   )}
                 </View>
               </Animated.View>
-            );
-          })}
-
-          {flow === 'saved' && (
-            <TouchableOpacity
-              style={[
-                styles.savedCardRow,
-                selected === 'new' && styles.rowSelected,
-              ]}
-              activeOpacity={0.7}
-              onPress={() => setSelected('new')}
-            >
-              <View style={styles.savedCardLeft}>
-                <View
-                  style={[styles.radio, selected === 'new' && styles.radioOn]}
-                >
-                  {selected === 'new' && <View style={styles.radioDot} />}
-                </View>
-                <Text style={styles.newCardText}>+ New card</Text>
-              </View>
-            </TouchableOpacity>
+            ))
           )}
         </View>
       )}
@@ -954,29 +1027,66 @@ const styles = StyleSheet.create({
     borderColor: '#0b8f83',
     backgroundColor: '#f0faf9',
   },
+
+  // saved-card dropdown (app-driven flow)
+  dropdownTrigger: {
+    height: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: '#c4c4c4',
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+  },
+  dropdownTriggerOpen: {
+    borderColor: '#0b8f83',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  dropdownPlaceholder: {
+    fontSize: 15,
+    color: '#9a9a9a',
+  },
+  caret: {
+    fontSize: 14,
+    color: '#0b8f83',
+    marginLeft: 12,
+  },
+  dropdownPanel: {
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: '#0b8f83',
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    backgroundColor: '#ffffff',
+    overflow: 'hidden',
+  },
+  dropdownOption: {
+    minHeight: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eeeeee',
+  },
+  dropdownOptionLast: {
+    borderBottomWidth: 0,
+  },
+  optionCheck: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0b8f83',
+  },
+
   savedCardLeft: {
     flexShrink: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-  },
-  radio: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: '#c4c4c4',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioOn: {
-    borderColor: '#0b8f83',
-  },
-  radioDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#0b8f83',
   },
   brand: {
     width: 34,

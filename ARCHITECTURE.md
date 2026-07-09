@@ -14,11 +14,12 @@ The app opens on a flow selector with two options:
 
 - **Embedded checkout** — the intention offers all saved cards; Paymob's native
   element renders them (in Paymob's own order) plus a new-card form.
-- **Saved cards (app-driven)** — the app renders its own ordered, single-select
-  saved-card list (plus a "New card" option). The chosen card **scopes the
-  intention** (`card_tokens = [that token]`), so the embedded element opens
-  showing **only that card** and collects its CVV. This honours the user's
-  selection/order while keeping CVV + 3-D Secure inside Paymob's UI.
+- **Saved cards (app-driven)** — the app renders its own single-select dropdown
+  of saved cards (plus a "New card" option); the selected card stays visible on
+  the closed dropdown. The chosen card **scopes the intention**
+  (`card_tokens = [that token]`), so the embedded element opens showing **only
+  that card** and collects its CVV. This honours the user's selection while
+  keeping CVV + 3-D Secure inside Paymob's UI.
 
 Both share the top-up screen (amount, quick-add chips, saved-card list, redirect
 checkbox) and the same webhook + result-poll plumbing.
@@ -73,7 +74,7 @@ also flow into the next intention's card tokens.
 
 ## App-driven saved-card flow
 
-The app owns the selection UI (ordered, single-select list + "New card"), then
+The app owns the selection UI (a single-select dropdown + "New card"), then
 scopes the intention to the chosen card so the embedded element shows only that
 card and collects its CVV. Selecting "New card" scopes the intention to no saved
 cards, so the element shows the new-card form.
@@ -102,7 +103,7 @@ element display just that card, keeping CVV/3-D Secure inside Paymob's UI.
 
 | Component | Role | Responsibility |
 | --- | --- | --- |
-| Mobile app | Client | Flow selection, amount entry, saved-card list (select/edit/reorder), embedded checkout (scoped per selection), result popup. |
+| Mobile app | Client | Flow selection, amount entry, saved-card selection (dropdown in the app-driven flow; an editable/reorderable list in the embedded flow), embedded checkout (scoped per selection), result popup. |
 | Backend (`example/server`) | Server | Holds the secret key; creates intentions; receives webhooks; persists cards; serves the result poll. |
 | Paymob | Provider | Oman intention API + embedded checkout; sends the authoritative callbacks. |
 | `saved-cards.json` | Store | Persists saved-card tokens across restarts (gitignored — holds PII). |
