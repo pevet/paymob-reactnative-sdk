@@ -4,3 +4,8 @@ extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autoli
 rootProject.name = 'paymobreactnative.example'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
+
+// react-native-config isn't picked up by autolinking under this RN version, so
+// register it manually (native module + the dotenv.gradle build hook below).
+include ':react-native-config'
+project(':react-native-config').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-config/android')

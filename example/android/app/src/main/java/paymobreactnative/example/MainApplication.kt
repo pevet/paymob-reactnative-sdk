@@ -18,8 +18,9 @@ class MainApplication : Application(), ReactApplication {
       object : DefaultReactNativeHost(this) {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
-              // Packages that cannot be autolinked yet can be added manually here, for example:
-              // add(MyReactNativePackage())
+              // react-native-config isn't autolinked under this RN version; add it
+              // manually so Config.* is populated at runtime.
+              add(com.lugg.RNCConfig.RNCConfigPackage())
             }
 
         override fun getJSMainModuleName(): String = "index"
