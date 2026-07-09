@@ -6,6 +6,7 @@ import {
   Animated,
   Button,
   Image,
+  Modal,
   PanResponder,
   ScrollView,
   StyleSheet,
@@ -73,6 +74,20 @@ function CardBrandIcon({ type }: { type?: string }) {
     );
   }
   return <View style={[styles.brand, styles.brandGeneric]} />;
+}
+
+// Blocking "payment in progress" overlay shown while awaiting confirmation.
+function ProcessingModal({ visible }: { visible: boolean }) {
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={styles.processingOverlay}>
+        <View style={styles.processingCard}>
+          <ActivityIndicator size="large" color="#07F0D7" />
+          <Text style={styles.processingText}>Payment in progress…</Text>
+        </View>
+      </View>
+    </Modal>
+  );
 }
 
 type SavedCardInfo = {
@@ -166,6 +181,7 @@ export default function CheckoutScreen() {
   const [agreed, setAgreed] = useState<boolean>(false);
   const [selected, setSelected] = useState<Selection>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [processing, setProcessing] = useState<boolean>(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
 
@@ -269,19 +285,26 @@ export default function CheckoutScreen() {
     }
   };
 
+  // Show the result popup; confirming it (OK) restarts at the flow selector.
   const showResult = (
     status: string | undefined,
     card: SavedCardInfo | null,
     source: string
   ) => {
+    const ok = [{ text: 'OK', onPress: goToSelect }];
     if (status === 'Failed') {
-      Alert.alert('Payment failed', `The payment was rejected.\n\n(${source})`);
+      Alert.alert(
+        'Payment failed',
+        `The payment was rejected.\n\n(${source})`,
+        ok
+      );
       return;
     }
     if (status === 'Pending') {
       Alert.alert(
         'Payment pending',
-        `Your payment is being processed.\n\n(${source})`
+        `Your payment is being processed.\n\n(${source})`,
+        ok
       );
       return;
     }
@@ -293,11 +316,16 @@ export default function CheckoutScreen() {
       ]
         .filter(Boolean)
         .join('\n');
-      Alert.alert('Payment successful', `Saved card\n${lines}\n\n(${source})`);
+      Alert.alert(
+        'Payment successful',
+        `Saved card\n${lines}\n\n(${source})`,
+        ok
+      );
     } else {
       Alert.alert(
         'Payment successful',
-        `Your payment was completed.\n\n(${source})`
+        `Your payment was completed.\n\n(${source})`,
+        ok
       );
     }
   };
@@ -400,12 +428,16 @@ export default function CheckoutScreen() {
   };
 
   const handleSuccess = async (event: any) => {
+    // Show the in-progress popup while we wait for the backend (webhook) to
+    // confirm the transaction, then replace it with the result popup.
+    setProcessing(true);
     const reference = referenceRef.current;
     const backend = reference ? await pollBackendResult(reference) : null;
     const confirmed = !!backend?.found && backend.status !== 'Created';
     const card =
       (backend?.savedCard as SavedCardInfo | null | undefined) ??
       extractSavedCard(event?.nativeEvent);
+    setProcessing(false);
     showResult(
       backend?.status ?? 'Success',
       card ?? null,
@@ -414,15 +446,20 @@ export default function CheckoutScreen() {
   };
 
   const handleFailure = (event: any) => {
+    setProcessing(false);
     const reason = event?.nativeEvent?.error;
     Alert.alert(
       'Payment failed',
-      reason ? `Reason: ${reason}` : 'The payment was rejected.'
+      reason ? `Reason: ${reason}` : 'The payment was rejected.',
+      [{ text: 'OK', onPress: goToSelect }]
     );
   };
 
   const handlePending = () => {
-    Alert.alert('Payment pending', 'Your payment is being processed.');
+    setProcessing(false);
+    Alert.alert('Payment pending', 'Your payment is being processed.', [
+      { text: 'OK', onPress: goToSelect },
+    ]);
   };
 
   // ---- Flow selection (first screen) ---------------------------------------
@@ -487,6 +524,7 @@ export default function CheckoutScreen() {
             <Button title="Start over" onPress={goToSelect} color="#888888" />
           </View>
         </ScrollView>
+        <ProcessingModal visible={processing} />
       </View>
     );
   }
@@ -1014,5 +1052,26 @@ const styles = StyleSheet.create({
   },
   resetButton: {
     marginTop: 8,
+  },
+
+  // payment-in-progress overlay
+  processingOverlay: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  processingCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    paddingVertical: 28,
+    paddingHorizontal: 36,
+    alignItems: 'center',
+    gap: 14,
+  },
+  processingText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111111',
   },
 });
