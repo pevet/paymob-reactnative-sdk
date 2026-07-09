@@ -12,6 +12,35 @@ const BACKEND_URL = (
   Config.PAYMOB_BACKEND_URL ?? 'http://localhost:3000'
 ).replace(/\/$/, '');
 
+export interface PaySavedResult {
+  reference: string;
+  transactionId: number | null;
+  pending: boolean;
+  success: boolean;
+  /** Present when the card needs a 3-D Secure challenge (open in a WebView). */
+  redirectionUrl: string | null;
+}
+
+/**
+ * App-driven flow: charge a specific saved-card token for the given amount.
+ * Returns a 3-D Secure `redirectionUrl` when a challenge is required.
+ */
+export async function paySaved(
+  amountOmr: number,
+  token: string
+): Promise<PaySavedResult> {
+  const response = await fetch(`${BACKEND_URL}/pay-saved`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount: amountOmr, token }),
+  });
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(`Pay failed (${response.status}): ${text.slice(0, 300)}`);
+  }
+  return JSON.parse(text) as PaySavedResult;
+}
+
 export interface SavedCard {
   token?: string;
   maskedPan?: string;

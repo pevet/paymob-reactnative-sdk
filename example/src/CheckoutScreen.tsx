@@ -6,6 +6,7 @@ import {
   Animated,
   Button,
   Image,
+  Modal,
   PanResponder,
   ScrollView,
   StyleSheet,
@@ -14,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 import {
   PaymobCheckoutView,
   type PaymobCheckoutViewRef,
@@ -23,6 +25,7 @@ import {
   deleteSavedCard,
   getSavedCards,
   getTransactionResult,
+  paySaved,
   reorderSavedCards,
   updateSavedCard,
   type SavedCard,
@@ -38,9 +41,14 @@ const QUICK_ADD = [5, 10, 15, 20];
 const BASE_BALANCE = 163.1; // cosmetic demo balance (OMR), shown before top-up
 const SAVED_CARD_ROW_H = 60; // saved-card tile height + gap (for drag math)
 
+type Flow = 'embedded' | 'saved';
+type Screen = 'select' | 'topup';
+// A selection is a card token, the sentinel 'new', or null (nothing chosen).
+type Selection = string | 'new' | null;
+
 // The rial glyph is Arabic (RTL); wrap it in an LTR isolate so it stays before
 // the number (e.g. "﷼ 5") instead of being reordered after it.
-const money = (v: string | number) => `⁦${RIAL}⁩ ${v}`;
+const money = (v: string | number) => `⁦${RIAL}⁩ ${v}`;
 
 // Compact masked pan for the tiles, e.g. "•••• 2346".
 const last4 = (pan?: string) => {
@@ -155,17 +163,22 @@ const CUSTOMIZATION: Record<string, string> = {
 export default function CheckoutScreen() {
   const checkoutRef = useRef<PaymobCheckoutViewRef>(null);
   const referenceRef = useRef<string | null>(null);
+  const [screen, setScreen] = useState<Screen>('select');
+  const [flow, setFlow] = useState<Flow>('embedded');
   const [amountText, setAmountText] = useState<string>('');
   const [agreed, setAgreed] = useState<boolean>(false);
+  const [selected, setSelected] = useState<Selection>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [threeDsUrl, setThreeDsUrl] = useState<string | null>(null);
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
 
   // Accepts '.' or ',' as the decimal separator regardless of device locale.
   const amount = parseFloat(amountText.replace(',', '.')) || 0;
   // Balance preview decreases by the entered amount (shows the base on load).
   const balance = (BASE_BALANCE - amount).toFixed(3);
-  const canContinue = amount > 0 && agreed;
+  const hasSelection = flow === 'embedded' || selected != null;
+  const canContinue = amount > 0 && agreed && hasSelection;
 
   const publicKey = Config.PAYMOB_PUBLIC_KEY ?? '';
 
@@ -185,36 +198,87 @@ export default function CheckoutScreen() {
     checkoutRef.current?.setPaymentKeys({ publicKey, clientSecret });
   }, [clientSecret, publicKey]);
 
-  // Load the saved cards for the top-up screen (and refresh when returning to it
-  // via "Start over"). Editing here happens before the intention is created, so
-  // changes also flow into the checkout via the intention's card tokens.
+  // Load saved cards whenever we're on the top-up screen (not the element).
   useEffect(() => {
-    if (clientSecret) {
+    if (screen !== 'topup' || clientSecret) {
       return;
     }
     let active = true;
     getSavedCards()
       .then((cards) => {
-        if (active) {
-          setSavedCards(cards);
+        if (!active) {
+          return;
+        }
+        setSavedCards(cards);
+        // App-driven flow: pre-select the first saved card, or "New card" if
+        // there are none. Don't override a choice the user already made.
+        if (flow === 'saved') {
+          setSelected((prev) => prev ?? cards[0]?.token ?? 'new');
         }
       })
       .catch(() => {});
     return () => {
       active = false;
     };
-  }, [clientSecret]);
+  }, [screen, clientSecret, flow]);
 
-  const handleContinue = async () => {
-    if (amount <= 0) {
-      Alert.alert('Choose an amount', 'Add an amount to top up first.');
+  // While the 3-D Secure WebView is open, poll for the authoritative result and
+  // close it once the transaction settles.
+  useEffect(() => {
+    if (!threeDsUrl) {
       return;
     }
+    const reference = referenceRef.current;
+    let active = true;
+    (async () => {
+      while (active && reference) {
+        try {
+          const r = await getTransactionResult(reference);
+          if (
+            r.found &&
+            (r.status === 'Success' ||
+              r.status === 'Failed' ||
+              r.status === 'Pending')
+          ) {
+            if (active) {
+              setThreeDsUrl(null);
+              showResult(r.status, r.savedCard ?? null, 'confirmed by backend');
+              goToSelect();
+            }
+            return;
+          }
+        } catch {
+          // ignore and keep polling
+        }
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [threeDsUrl]);
 
+  const goToSelect = () => {
+    referenceRef.current = null;
+    setClientSecret(null);
+    setThreeDsUrl(null);
+    setSelected(null);
+    setAmountText('');
+    setAgreed(false);
+    setScreen('select');
+  };
+
+  const chooseFlow = (f: Flow) => {
+    setFlow(f);
+    setSelected(null);
+    setAmountText('');
+    setAgreed(false);
+    setScreen('topup');
+  };
+
+  const startEmbedded = async () => {
     setLoading(true);
     try {
-      // Backend creates the intention (with the secret key, and the current
-      // saved-card tokens) and returns the client secret + a reference.
       const { clientSecret: secret, reference } = await createIntention(amount);
       referenceRef.current = reference;
       setClientSecret(secret);
@@ -225,12 +289,67 @@ export default function CheckoutScreen() {
     }
   };
 
-  const reset = () => {
-    referenceRef.current = null;
-    setClientSecret(null);
-    setSavedCards([]);
-    setAmountText('');
-    setAgreed(false);
+  const payWithSavedCard = async (token: string) => {
+    setLoading(true);
+    try {
+      const res = await paySaved(amount, token);
+      referenceRef.current = res.reference;
+      if (res.redirectionUrl) {
+        setThreeDsUrl(res.redirectionUrl); // 3-D Secure challenge
+      } else {
+        const r = await pollBackendResult(res.reference);
+        showResult(r?.status, r?.savedCard ?? null, 'confirmed by backend');
+        goToSelect();
+      }
+    } catch (error: any) {
+      Alert.alert('Payment failed', error?.message ?? 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleContinue = () => {
+    if (!canContinue) {
+      return;
+    }
+    if (flow === 'saved' && selected && selected !== 'new') {
+      payWithSavedCard(selected);
+    } else {
+      startEmbedded(); // embedded flow, or "new card" in the saved flow
+    }
+  };
+
+  const showResult = (
+    status: string | undefined,
+    card: SavedCardInfo | null,
+    source: string
+  ) => {
+    if (status === 'Failed') {
+      Alert.alert('Payment failed', `The payment was rejected.\n\n(${source})`);
+      return;
+    }
+    if (status === 'Pending') {
+      Alert.alert(
+        'Payment pending',
+        `Your payment is being processed.\n\n(${source})`
+      );
+      return;
+    }
+    if (card && (card.maskedPan || card.token)) {
+      const lines = [
+        card.maskedPan ? `Card: ${card.maskedPan}` : null,
+        card.cardType ? `Type: ${card.cardType}` : null,
+        card.token ? `Token: ${card.token}` : null,
+      ]
+        .filter(Boolean)
+        .join('\n');
+      Alert.alert('Payment successful', `Saved card\n${lines}\n\n(${source})`);
+    } else {
+      Alert.alert(
+        'Payment successful',
+        `Your payment was completed.\n\n(${source})`
+      );
+    }
   };
 
   const addAmount = (v: number) => {
@@ -300,6 +419,9 @@ export default function CheckoutScreen() {
     try {
       await deleteSavedCard(card.token);
       setSavedCards((cards) => cards.filter((c) => c.token !== card.token));
+      if (selected === card.token) {
+        setSelected(null);
+      }
     } catch (e: any) {
       Alert.alert('Could not delete card', e?.message ?? 'Unknown error');
     }
@@ -328,35 +450,17 @@ export default function CheckoutScreen() {
   };
 
   const handleSuccess = async (event: any) => {
-    // Prefer the authoritative, webhook-sourced result from the backend; fall
-    // back to the in-app callback payload if the webhook hasn't arrived (e.g.
-    // no public tunnel configured).
     const reference = referenceRef.current;
     const backend = reference ? await pollBackendResult(reference) : null;
     const confirmed = !!backend?.found && backend.status !== 'Created';
-
     const card =
       (backend?.savedCard as SavedCardInfo | null | undefined) ??
       extractSavedCard(event?.nativeEvent);
-    const source = confirmed
-      ? 'confirmed by backend'
-      : 'device (webhook pending)';
-
-    if (card && (card.maskedPan || card.token)) {
-      const lines = [
-        card.maskedPan ? `Card: ${card.maskedPan}` : null,
-        card.cardType ? `Type: ${card.cardType}` : null,
-        card.token ? `Token: ${card.token}` : null,
-      ]
-        .filter(Boolean)
-        .join('\n');
-      Alert.alert('Payment successful', `Saved card\n${lines}\n\n(${source})`);
-    } else {
-      Alert.alert(
-        'Payment successful',
-        `Your payment was completed.\n\n(${source})`
-      );
-    }
+    showResult(
+      backend?.status ?? 'Success',
+      card ?? null,
+      confirmed ? 'confirmed by backend' : 'device (webhook pending)'
+    );
   };
 
   const handleFailure = (event: any) => {
@@ -371,7 +475,42 @@ export default function CheckoutScreen() {
     Alert.alert('Payment pending', 'Your payment is being processed.');
   };
 
-  // ---- Checkout screen (after Continue) ------------------------------------
+  // ---- Flow selection (first screen) ---------------------------------------
+  if (screen === 'select') {
+    return (
+      <View style={styles.screen}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Top up</Text>
+        </View>
+        <Text style={styles.subtitle}>Choose how you’d like to pay</Text>
+        <View style={styles.selectWrap}>
+          <TouchableOpacity
+            style={styles.selectCard}
+            onPress={() => chooseFlow('embedded')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.selectTitle}>Paymob checkout</Text>
+            <Text style={styles.selectDesc}>
+              Pay with Paymob’s secure embedded element (saved cards and new
+              card).
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.selectCard}
+            onPress={() => chooseFlow('saved')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.selectTitle}>Saved cards</Text>
+            <Text style={styles.selectDesc}>
+              Pick one of your saved cards (or a new card) and pay in-app.
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  // ---- Embedded checkout screen (after Continue) ---------------------------
   if (clientSecret) {
     return (
       <View style={styles.container}>
@@ -395,18 +534,23 @@ export default function CheckoutScreen() {
             onPending={handlePending}
           />
           <View style={styles.resetButton}>
-            <Button title="Start over" onPress={reset} color="#888888" />
+            <Button title="Start over" onPress={goToSelect} color="#888888" />
           </View>
         </ScrollView>
       </View>
     );
   }
 
-  // ---- Top-up screen (first screen) ----------------------------------------
+  // ---- Top-up screen -------------------------------------------------------
+  const showCards = flow === 'saved' || savedCards.length > 0;
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.back} accessibilityLabel="Back">
+        <TouchableOpacity
+          style={styles.back}
+          onPress={goToSelect}
+          accessibilityLabel="Back"
+        >
           <Text style={styles.backChevron}>‹</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Debit card</Text>
@@ -452,57 +596,94 @@ export default function CheckoutScreen() {
         ))}
       </View>
 
-      {savedCards.length > 0 && (
+      {showCards && (
         <View style={styles.savedCards}>
           <View style={styles.savedCardsHeader}>
-            <Text style={styles.savedCardsTitle}>Saved cards</Text>
+            <Text style={styles.savedCardsTitle}>
+              {flow === 'saved' ? 'Pay with' : 'Saved cards'}
+            </Text>
             {savedCards.length > 1 && (
               <Text style={styles.savedCardsHint}>≡ drag to reorder</Text>
             )}
           </View>
-          {savedCards.map((c, i) => (
-            <Animated.View
-              key={c.token ?? String(i)}
+
+          {savedCards.map((c, i) => {
+            const isSelected = flow === 'saved' && selected === c.token;
+            return (
+              <Animated.View
+                key={c.token ?? String(i)}
+                style={[
+                  styles.savedCardRow,
+                  isSelected && styles.rowSelected,
+                  i === dragIndex && {
+                    transform: [{ translateY: dragY }],
+                    zIndex: 10,
+                    elevation: 6,
+                    shadowColor: '#000000',
+                    shadowOpacity: 0.15,
+                    shadowRadius: 8,
+                    shadowOffset: { width: 0, height: 3 },
+                  },
+                ]}
+              >
+                <TouchableOpacity
+                  style={styles.savedCardLeft}
+                  activeOpacity={0.7}
+                  disabled={flow !== 'saved'}
+                  onPress={() => setSelected(c.token ?? null)}
+                >
+                  {flow === 'saved' && (
+                    <View style={[styles.radio, isSelected && styles.radioOn]}>
+                      {isSelected && <View style={styles.radioDot} />}
+                    </View>
+                  )}
+                  <CardBrandIcon type={c.cardType} />
+                  <Text style={styles.savedCardType} numberOfLines={1}>
+                    {c.nickname || c.cardType || 'Card'}
+                  </Text>
+                </TouchableOpacity>
+                <View style={styles.savedCardRight}>
+                  <Text style={styles.savedCardPan}>{last4(c.maskedPan)}</Text>
+                  <TouchableOpacity
+                    style={styles.editBtn}
+                    onPress={() => openEditCard(c)}
+                    accessibilityLabel="Edit card"
+                  >
+                    <Text style={styles.editIcon}>✎</Text>
+                  </TouchableOpacity>
+                  {savedCards.length > 1 && (
+                    <View
+                      style={styles.grip}
+                      accessibilityLabel="Drag to reorder"
+                      {...makeDragResponder(i).panHandlers}
+                    >
+                      <Text style={styles.gripIcon}>≡</Text>
+                    </View>
+                  )}
+                </View>
+              </Animated.View>
+            );
+          })}
+
+          {flow === 'saved' && (
+            <TouchableOpacity
               style={[
                 styles.savedCardRow,
-                i === dragIndex && {
-                  transform: [{ translateY: dragY }],
-                  zIndex: 10,
-                  elevation: 6,
-                  shadowColor: '#000000',
-                  shadowOpacity: 0.15,
-                  shadowRadius: 8,
-                  shadowOffset: { width: 0, height: 3 },
-                },
+                selected === 'new' && styles.rowSelected,
               ]}
+              activeOpacity={0.7}
+              onPress={() => setSelected('new')}
             >
               <View style={styles.savedCardLeft}>
-                <CardBrandIcon type={c.cardType} />
-                <Text style={styles.savedCardType} numberOfLines={1}>
-                  {c.nickname || c.cardType || 'Card'}
-                </Text>
-              </View>
-              <View style={styles.savedCardRight}>
-                <Text style={styles.savedCardPan}>{last4(c.maskedPan)}</Text>
-                <TouchableOpacity
-                  style={styles.editBtn}
-                  onPress={() => openEditCard(c)}
-                  accessibilityLabel="Edit card"
+                <View
+                  style={[styles.radio, selected === 'new' && styles.radioOn]}
                 >
-                  <Text style={styles.editIcon}>✎</Text>
-                </TouchableOpacity>
-                {savedCards.length > 1 && (
-                  <View
-                    style={styles.grip}
-                    accessibilityLabel="Drag to reorder"
-                    {...makeDragResponder(i).panHandlers}
-                  >
-                    <Text style={styles.gripIcon}>≡</Text>
-                  </View>
-                )}
+                  {selected === 'new' && <View style={styles.radioDot} />}
+                </View>
+                <Text style={styles.newCardText}>+ New card</Text>
               </View>
-            </Animated.View>
-          ))}
+            </TouchableOpacity>
+          )}
         </View>
       )}
 
@@ -535,6 +716,24 @@ export default function CheckoutScreen() {
           <Text style={styles.continueText}>Continue</Text>
         )}
       </TouchableOpacity>
+
+      <Modal
+        visible={!!threeDsUrl}
+        animationType="slide"
+        onRequestClose={() => setThreeDsUrl(null)}
+      >
+        <View style={styles.webviewContainer}>
+          <View style={styles.webviewHeader}>
+            <Text style={styles.webviewTitle}>Secure payment</Text>
+            <TouchableOpacity onPress={() => setThreeDsUrl(null)}>
+              <Text style={styles.webviewClose}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+          {threeDsUrl && (
+            <WebView source={{ uri: threeDsUrl }} style={styles.webview} />
+          )}
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -545,7 +744,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
 
-  // top-up screen
+  // top-up + select screens
   screen: {
     flex: 1,
     backgroundColor: '#ffffff',
@@ -584,6 +783,32 @@ const styles = StyleSheet.create({
   subtitleBold: {
     fontWeight: '700',
   },
+
+  // select screen
+  selectWrap: {
+    marginHorizontal: 20,
+    marginTop: 28,
+    gap: 16,
+  },
+  selectCard: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 16,
+    padding: 20,
+    backgroundColor: '#fafafa',
+  },
+  selectTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111111',
+    marginBottom: 6,
+  },
+  selectDesc: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#6b6b6b',
+  },
+
   cardWrap: {
     marginHorizontal: 20,
     marginTop: 28,
@@ -722,6 +947,8 @@ const styles = StyleSheet.create({
   checkoutContent: {
     padding: 24,
   },
+
+  // saved cards
   savedCards: {
     marginHorizontal: 20,
     marginTop: 24,
@@ -753,11 +980,33 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     backgroundColor: '#fafafa',
   },
+  rowSelected: {
+    borderColor: '#0b8f83',
+    backgroundColor: '#f0faf9',
+  },
   savedCardLeft: {
     flexShrink: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+  },
+  radio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: '#c4c4c4',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioOn: {
+    borderColor: '#0b8f83',
+  },
+  radioDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#0b8f83',
   },
   brand: {
     width: 34,
@@ -822,11 +1071,45 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#b8b8b8',
   },
+  newCardText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#0b8f83',
+  },
   embedded: {
     width: '100%',
     marginBottom: 16,
   },
   resetButton: {
     marginTop: 8,
+  },
+
+  // 3-D Secure WebView
+  webviewContainer: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  webviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 54,
+    paddingBottom: 12,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  webviewTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#111111',
+  },
+  webviewClose: {
+    fontSize: 16,
+    color: '#0b8f83',
+    fontWeight: '600',
+  },
+  webview: {
+    flex: 1,
   },
 });
