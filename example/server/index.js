@@ -4,6 +4,8 @@
  * Responsibilities (all the things that must NOT live in the mobile app):
  *   1. POST /intentions          Create a payment intention with the SECRET key
  *                                and return only the client_secret + a reference.
+ *   1b. POST /pay-saved          App-driven flow: charge a saved token directly
+ *                                (headless); returns a 3-D Secure redirect URL.
  *   2. POST /paymob/webhook       Receive Paymob's server-to-server callbacks
  *                                (notification_url). This is the AUTHORITATIVE
  *                                transaction result. Paymob sends two kinds:
@@ -38,6 +40,7 @@ const PUBLIC_URL = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
 const NOTIFICATION_URL = `${PUBLIC_URL.replace(/\/$/, '')}/paymob/webhook`;
 
 const INTENTION_URL = 'https://oman.paymob.com/v1/intention/';
+const PAY_URL = 'https://oman.paymob.com/api/acceptance/payments/pay';
 const CURRENCY = 'OMR';
 const PAYMENT_METHODS = [70072];
 
@@ -103,7 +106,60 @@ const app = express();
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// --- 1. Create intention (secret key stays here) ----------------------------
+// Create a Paymob intention for the given OMR amount and return
+// { reference, data }. Shared by the embedded flow (uses client_secret) and the
+// app-driven flow (uses payment_keys for a direct token pay).
+async function createPaymobIntention(amountOmr) {
+  // OMR has 3 decimals; Paymob expects the smallest subunit (baisa).
+  const amount = Math.round(amountOmr * 1000);
+  const reference = `rn_demo_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+
+  // Pre-load saved cards into the checkout by passing their tokens. Paymob
+  // silently drops invalid/expired tokens, so sending the whole list is safe.
+  const cardTokens = listSavedCards()
+    .map((c) => c.token)
+    .filter(Boolean);
+
+  const body = {
+    amount,
+    currency: CURRENCY,
+    payment_methods: PAYMENT_METHODS,
+    card_tokens: cardTokens,
+    items: [],
+    billing_data: {
+      first_name: 'Test',
+      last_name: 'Account',
+      phone_number: '+96890000000',
+      email: 'test@example.com',
+    },
+    extras: {},
+    special_reference: reference,
+    expiration: 3600,
+    notification_url: NOTIFICATION_URL,
+  };
+
+  const resp = await fetch(INTENTION_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Token ${SECRET_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  const text = await resp.text();
+  if (!resp.ok) {
+    throw new Error(`intention failed (${resp.status}): ${text.slice(0, 300)}`);
+  }
+  const data = JSON.parse(text);
+  if (!data.client_secret) {
+    throw new Error('no client_secret in intention response');
+  }
+  // Seed so the app's poll gets a definite "not settled yet" answer.
+  results.set(reference, { status: 'Created', updatedAt: Date.now() });
+  return { reference, data, amount };
+}
+
+// --- 1a. Embedded flow: create intention, return client_secret --------------
 app.post('/intentions', async (req, res) => {
   try {
     if (!SECRET_KEY) {
@@ -117,60 +173,8 @@ app.post('/intentions', async (req, res) => {
         .status(400)
         .json({ error: 'amount must be a positive number' });
     }
-    // OMR has 3 decimals; Paymob expects the smallest subunit (baisa).
-    const amount = Math.round(amountOmr * 1000);
-    const reference = `rn_demo_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
-
-    // Pre-load saved cards into the checkout by passing their tokens. Paymob
-    // silently drops invalid/expired tokens, so sending the whole list is safe.
-    // (Demo-global; scope to the authenticated customer in production.)
-    const cardTokens = listSavedCards()
-      .map((c) => c.token)
-      .filter(Boolean);
-
-    const body = {
-      amount,
-      currency: CURRENCY,
-      payment_methods: PAYMENT_METHODS,
-      card_tokens: cardTokens,
-      items: [],
-      billing_data: {
-        first_name: 'Test',
-        last_name: 'Account',
-        phone_number: '+96890000000',
-        email: 'test@example.com',
-      },
-      extras: {},
-      special_reference: reference,
-      expiration: 3600,
-      notification_url: NOTIFICATION_URL,
-    };
-
-    const resp = await fetch(INTENTION_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Token ${SECRET_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-    const text = await resp.text();
-    if (!resp.ok) {
-      return res.status(502).json({
-        error: `intention failed (${resp.status}): ${text.slice(0, 300)}`,
-      });
-    }
-    const data = JSON.parse(text);
-    if (!data.client_secret) {
-      return res
-        .status(502)
-        .json({ error: 'no client_secret in intention response' });
-    }
-
-    // Seed so the app's poll gets a definite "not settled yet" answer.
-    results.set(reference, { status: 'Created', updatedAt: Date.now() });
+    const { reference, data, amount } = await createPaymobIntention(amountOmr);
     console.log(`[intention] created reference=${reference} amount=${amount}`);
-    // Include the saved cards so the app can offer them alongside checkout.
     res.json({
       clientSecret: data.client_secret,
       reference,
@@ -178,6 +182,67 @@ app.post('/intentions', async (req, res) => {
     });
   } catch (err) {
     console.error('[intention] error', err);
+    res.status(500).json({ error: String(err?.message || err) });
+  }
+});
+
+// --- 1b. App-driven flow: pay a saved token directly (headless) -------------
+// Creates an intention, then charges the given token via the payments API.
+// Returns a 3-D Secure redirection URL when the card requires a challenge; the
+// authoritative result still arrives via the webhook and /tx/:reference.
+app.post('/pay-saved', async (req, res) => {
+  try {
+    if (!SECRET_KEY) {
+      return res
+        .status(500)
+        .json({ error: 'PAYMOB_SECRET_KEY not configured' });
+    }
+    const amountOmr = Number(req.body?.amount);
+    const token = req.body?.token;
+    if (!Number.isFinite(amountOmr) || amountOmr <= 0) {
+      return res
+        .status(400)
+        .json({ error: 'amount must be a positive number' });
+    }
+    if (!token) {
+      return res.status(400).json({ error: 'token is required' });
+    }
+
+    const { reference, data } = await createPaymobIntention(amountOmr);
+    const paymentToken = data.payment_keys?.[0]?.key;
+    if (!paymentToken) {
+      return res.status(502).json({ error: 'no payment_token in intention' });
+    }
+
+    const payResp = await fetch(PAY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source: { identifier: token, subtype: 'TOKEN' },
+        payment_token: paymentToken,
+      }),
+    });
+    const payText = await payResp.text();
+    if (!payResp.ok) {
+      return res
+        .status(502)
+        .json({ error: `pay failed (${payResp.status}): ${payText.slice(0, 300)}` });
+    }
+    const pd = JSON.parse(payText);
+    // Paymob returns booleans as strings here ("true"/"false").
+    const useRedirection = String(pd.use_redirection) === 'true';
+    console.log(
+      `[pay-saved] ref=${reference} txn=${pd.id} pending=${pd.pending} 3ds=${pd.is_3d_secure}`
+    );
+    res.json({
+      reference,
+      transactionId: pd.id ?? null,
+      pending: String(pd.pending) === 'true',
+      success: String(pd.success) === 'true',
+      redirectionUrl: useRedirection ? (pd.redirection_url ?? null) : null,
+    });
+  } catch (err) {
+    console.error('[pay-saved] error', err);
     res.status(500).json({ error: String(err?.message || err) });
   }
 });

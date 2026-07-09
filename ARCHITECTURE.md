@@ -8,7 +8,21 @@ truth** for the transaction result and the saved card.
 > and the minimal backend in [`example/server/`](example/server). It is not part
 > of the published SDK.
 
-## Flow
+## Two payment flows
+
+The app opens on a flow selector with two options:
+
+- **Embedded checkout** — Paymob's native element handles card entry and saved
+  cards. Simple, but Paymob controls the saved-card order.
+- **Saved cards (app-driven)** — the app renders its own ordered, selectable
+  saved-card list (plus a "New card" option) and charges the chosen token
+  headlessly, hosting the 3-D Secure challenge in a WebView. Full control of the
+  list and order.
+
+Both share the top-up screen (amount, quick-add chips, saved-card list, redirect
+checkbox) and the same webhook + result-poll plumbing.
+
+## Embedded checkout flow
 
 ```mermaid
 sequenceDiagram
@@ -50,11 +64,37 @@ one (a nickname is shown in place of the card type), **delete** it, or
 `PATCH` / `DELETE /saved-cards/:token` and `PUT /saved-cards/order`, so they
 also flow into the next intention's card tokens.
 
+## App-driven saved-card flow
+
+The app charges a chosen saved-card token itself and hosts 3-D Secure, so the
+Paymob element (and its saved-card ordering) is bypassed. Selecting "New card"
+falls back to the embedded flow above.
+
+```mermaid
+sequenceDiagram
+    participant App as Mobile app (RN, iOS)
+    participant BE as Backend (Express)
+    participant PM as Paymob (Oman)
+    App->>BE: 1. POST /pay-saved {amount, token}
+    BE->>PM: 2. create intention -> payment_token
+    BE->>PM: 3. payments/pay {source: TOKEN, payment_token}
+    PM-->>BE: 4. pending + 3-D Secure redirection_url
+    BE-->>App: 5. { reference, redirectionUrl }
+    App->>PM: 6. open redirection_url in a WebView (3-D Secure)
+    PM->>BE: 7. webhook: TRANSACTION + TOKEN (via cloudflared tunnel)
+    App->>BE: 8. poll GET /tx/:reference -> status + saved card
+```
+
+Why this is needed: Paymob re-sorts saved cards by its own rule and ignores the
+`card_tokens` order, so the only way to honour a user-chosen order (and
+selection) is to drive the payment from the app. Uses a standard integration, so
+3-D Secure still applies (customer-present).
+
 ## Components
 
 | Component | Role | Responsibility |
 | --- | --- | --- |
-| Mobile app | Client | Amount entry, saved-card list, embedded checkout, result popup. |
+| Mobile app | Client | Flow selection, amount entry, saved-card list (select/edit/reorder), embedded checkout or 3-D Secure WebView, result popup. |
 | Backend (`example/server`) | Server | Holds the secret key; creates intentions; receives webhooks; persists cards; serves the result poll. |
 | Paymob | Provider | Oman intention API + embedded checkout; sends the authoritative callbacks. |
 | `saved-cards.json` | Store | Persists saved-card tokens across restarts (gitignored — holds PII). |
@@ -81,7 +121,8 @@ also flow into the next intention's card tokens.
 
 | Endpoint | Purpose |
 | --- | --- |
-| `POST /intentions` | Create the intention (secret key + `card_tokens`); returns `clientSecret`, `reference`, `savedCards`. |
+| `POST /intentions` | Embedded flow: create the intention (secret key + `card_tokens`); returns `clientSecret`, `reference`, `savedCards`. |
+| `POST /pay-saved` | App-driven flow: create an intention then charge a saved token; returns a 3-D Secure `redirectionUrl`. |
 | `POST /paymob/webhook` | Paymob's `notification_url`; captures the `TRANSACTION` result and `TOKEN` saved card. |
 | `GET /tx/:reference` | The result the app polls: status plus saved card. |
 | `GET /saved-cards` | Lists the cards persisted from token callbacks. |
