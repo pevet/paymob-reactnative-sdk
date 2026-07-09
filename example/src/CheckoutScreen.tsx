@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {
@@ -22,9 +23,17 @@ import {
   type TransactionResult,
 } from './api/paymob';
 
-// walletii by Ooredoo brand logo, shown in our own header banner (the embedded
-// Paymob element has no merchant name/icon field, so we brand around it).
+// walletii by Ooredoo brand logo, shown on the checkout screen's header banner.
 const walletiiLogo = require('./assets/walletii-logo.png');
+
+const RIAL = '﷼'; // Omani Rial sign ﷼
+const FLAG = '🇴🇲'; // 🇴🇲
+const QUICK_ADD = [5, 10, 15, 20];
+const CURRENT_BALANCE = '163.100'; // cosmetic demo balance
+
+// The rial glyph is Arabic (RTL); wrap it in an LTR isolate so it stays before
+// the number (e.g. "﷼ 5") instead of being reordered after it.
+const money = (v: string | number) => `⁦${RIAL}⁩ ${v}`;
 
 type SavedCardInfo = {
   maskedPan?: string;
@@ -100,20 +109,24 @@ async function pollBackendResult(
 // the Android SDK's camelCase keys (e.g. `colorPrimary`). This example targets
 // iOS, so the iOS key names are used here.
 const CUSTOMIZATION: Record<string, string> = {
+  Color_Container: '#FFF8E1', // embedded element background (gentle yellow)
   Color_Primary: '#07F0D7', // payment button background (active)
   Color_Disabled: '#C7CDD1', // payment button background (inactive/disabled)
   Text_Color_For_Payment_Button: '#051926', // payment button text
   Radius_Border: '8',
-  Payment_Button_Title: 'Pay now',
+  Payment_Button_Title: 'Continue',
 };
 
 export default function CheckoutScreen() {
   const checkoutRef = useRef<PaymobCheckoutViewRef>(null);
   const referenceRef = useRef<string | null>(null);
-  const [amount, setAmount] = useState<string>('1.500');
+  const [amountText, setAmountText] = useState<string>('5');
   const [loading, setLoading] = useState<boolean>(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
+
+  // Accepts '.' or ',' as the decimal separator regardless of device locale.
+  const amount = parseFloat(amountText.replace(',', '.')) || 0;
 
   const publicKey = Config.PAYMOB_PUBLIC_KEY ?? '';
 
@@ -133,13 +146,9 @@ export default function CheckoutScreen() {
     checkoutRef.current?.setPaymentKeys({ publicKey, clientSecret });
   }, [clientSecret, publicKey]);
 
-  const handlePay = async () => {
-    // Accept both '.' and ',' as the decimal separator regardless of the
-    // device's locale/region, then parse against a fixed '.'-based format.
-    const normalized = amount.trim().replace(',', '.');
-    const amountOmr = parseFloat(normalized);
-    if (!Number.isFinite(amountOmr) || amountOmr <= 0) {
-      Alert.alert('Invalid amount', 'Please enter an amount greater than 0.');
+  const handleContinue = async () => {
+    if (amount <= 0) {
+      Alert.alert('Choose an amount', 'Add an amount to top up first.');
       return;
     }
 
@@ -152,7 +161,7 @@ export default function CheckoutScreen() {
         clientSecret: secret,
         reference,
         savedCards: cards,
-      } = await createIntention(amountOmr);
+      } = await createIntention(amount);
       referenceRef.current = reference;
       setSavedCards(cards);
       setClientSecret(secret);
@@ -167,7 +176,11 @@ export default function CheckoutScreen() {
     referenceRef.current = null;
     setClientSecret(null);
     setSavedCards([]);
-    setAmount('1.500');
+    setAmountText('5');
+  };
+
+  const addAmount = (v: number) => {
+    setAmountText(String(Math.round((amount + v) * 1000) / 1000));
   };
 
   const handleSuccess = async (event: any) => {
@@ -214,63 +227,123 @@ export default function CheckoutScreen() {
     Alert.alert('Payment pending', 'Your payment is being processed.');
   };
 
+  // ---- Checkout screen (after Continue) ------------------------------------
+  if (clientSecret) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.banner}>
+          <Image
+            style={styles.logo}
+            source={walletiiLogo}
+            resizeMode="contain"
+          />
+        </View>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.checkoutContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          {savedCards.length > 0 && (
+            <View style={styles.savedCards}>
+              <Text style={styles.savedCardsTitle}>Saved cards</Text>
+              {savedCards.map((c, i) => (
+                <View key={c.token ?? String(i)} style={styles.savedCardRow}>
+                  <Text style={styles.savedCardType}>
+                    {c.cardType ?? 'Card'}
+                  </Text>
+                  <Text style={styles.savedCardPan}>{c.maskedPan ?? ''}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+          <PaymobCheckoutView
+            ref={checkoutRef}
+            style={styles.embedded}
+            onSuccess={handleSuccess}
+            onFailure={handleFailure}
+            onPending={handlePending}
+          />
+          <View style={styles.resetButton}>
+            <Button title="Start over" onPress={reset} color="#888888" />
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
+  // ---- Top-up screen (first screen) ----------------------------------------
   return (
-    <View style={styles.container}>
-      <View style={styles.banner}>
-        <Image style={styles.logo} source={walletiiLogo} resizeMode="contain" />
+    <View style={styles.screen}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.back} accessibilityLabel="Back">
+          <Text style={styles.backChevron}>‹</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Debit card</Text>
       </View>
 
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Text style={styles.label}>Amount (OMR)</Text>
-        <TextInput
-          style={styles.input}
-          value={amount}
-          onChangeText={setAmount}
-          editable={!clientSecret && !loading}
-          keyboardType="decimal-pad"
-          placeholder="e.g. 1.500"
-        />
+      <Text style={styles.subtitle}>
+        It’s <Text style={styles.subtitleBold}>free of charge</Text> and we
+        accept all local debit cards
+      </Text>
 
-        {!clientSecret ? (
-          <View style={styles.payButton}>
-            {loading ? (
-              <ActivityIndicator size="large" color="#000000" />
-            ) : (
-              <Button title="Pay" onPress={handlePay} color="#000000" />
-            )}
+      <View style={styles.cardWrap}>
+        <View style={styles.amountCard}>
+          <TextInput
+            style={styles.amountInput}
+            value={amountText}
+            onChangeText={(t) => setAmountText(t.replace(/[^0-9.,]/g, ''))}
+            keyboardType="decimal-pad"
+            placeholder="0"
+            placeholderTextColor="#c4c4c4"
+            selectTextOnFocus
+          />
+          <View style={styles.currencyRow}>
+            <Text style={styles.flag}>{FLAG}</Text>
+            <Text style={styles.rial}>{RIAL}</Text>
           </View>
+        </View>
+        <View style={styles.balanceBar}>
+          <Text style={styles.balanceText}>
+            {`Current balance: ${money(CURRENT_BALANCE)}`}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.chips}>
+        {QUICK_ADD.map((v) => (
+          <TouchableOpacity
+            key={v}
+            style={styles.chip}
+            onPress={() => addAmount(v)}
+          >
+            <Text style={styles.chipText}>{`+ ${money(v)}`}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={styles.spacer} />
+
+      <View style={styles.secureNote}>
+        <View style={styles.shield}>
+          <Text style={styles.shieldCheck}>✓</Text>
+        </View>
+        <Text style={styles.secureText}>
+          You will be redirected to a secure payment page to enter your card
+          details.
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        style={[styles.continueBtn, amount <= 0 && styles.continueBtnDisabled]}
+        onPress={handleContinue}
+        disabled={loading || amount <= 0}
+      >
+        {loading ? (
+          <ActivityIndicator color="#051926" />
         ) : (
-          <>
-            {savedCards.length > 0 && (
-              <View style={styles.savedCards}>
-                <Text style={styles.savedCardsTitle}>Saved cards</Text>
-                {savedCards.map((c, i) => (
-                  <View key={c.token ?? String(i)} style={styles.savedCardRow}>
-                    <Text style={styles.savedCardType}>
-                      {c.cardType ?? 'Card'}
-                    </Text>
-                    <Text style={styles.savedCardPan}>{c.maskedPan ?? ''}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-            <PaymobCheckoutView
-              ref={checkoutRef}
-              style={styles.embedded}
-              onSuccess={handleSuccess}
-              onFailure={handleFailure}
-              onPending={handlePending}
-            />
-            <View style={styles.resetButton}>
-              <Button title="Start over" onPress={reset} color="#888888" />
-            </View>
-          </>
+          <Text style={styles.continueText}>Continue</Text>
         )}
-      </ScrollView>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -280,9 +353,165 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
   },
-  content: {
-    padding: 24,
+
+  // top-up screen
+  screen: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    paddingBottom: 12,
   },
+  header: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+  },
+  back: {
+    position: 'absolute',
+    left: 18,
+    top: 6,
+    bottom: 6,
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+  },
+  backChevron: {
+    fontSize: 30,
+    color: '#111111',
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#111111',
+  },
+  subtitle: {
+    textAlign: 'center',
+    fontSize: 16,
+    lineHeight: 22,
+    color: '#1a1a1a',
+    marginHorizontal: 28,
+    marginTop: 6,
+  },
+  subtitleBold: {
+    fontWeight: '700',
+  },
+  cardWrap: {
+    marginHorizontal: 20,
+    marginTop: 28,
+  },
+  amountCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    paddingVertical: 44,
+    alignItems: 'center',
+    zIndex: 2,
+    shadowColor: '#000000',
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
+  },
+  amountInput: {
+    alignSelf: 'stretch',
+    textAlign: 'center',
+    fontSize: 68,
+    fontWeight: '800',
+    color: '#111111',
+    letterSpacing: -1,
+    padding: 0,
+  },
+  currencyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 8,
+  },
+  flag: {
+    fontSize: 20,
+  },
+  rial: {
+    fontSize: 20,
+    color: '#111111',
+  },
+  balanceBar: {
+    backgroundColor: '#D3F500',
+    borderRadius: 24,
+    marginTop: -28,
+    paddingTop: 42,
+    paddingBottom: 18,
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  balanceText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111111',
+    writingDirection: 'ltr',
+  },
+  chips: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginTop: 22,
+    gap: 10,
+  },
+  chip: {
+    flex: 1,
+    backgroundColor: '#efefef',
+    borderRadius: 22,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  chipText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111111',
+    writingDirection: 'ltr',
+  },
+  spacer: {
+    flex: 1,
+  },
+  secureNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 24,
+    marginBottom: 16,
+    gap: 10,
+  },
+  shield: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    backgroundColor: '#07F0D7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shieldCheck: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#051926',
+  },
+  secureText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#6b6b6b',
+  },
+  continueBtn: {
+    marginHorizontal: 20,
+    minHeight: 58,
+    borderRadius: 30,
+    backgroundColor: '#07F0D7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  continueBtnDisabled: {
+    backgroundColor: '#C7CDD1',
+  },
+  continueText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#051926',
+  },
+
+  // checkout screen
   banner: {
     backgroundColor: '#0A1925',
     alignItems: 'center',
@@ -293,23 +522,8 @@ const styles = StyleSheet.create({
     height: 48,
     width: 160,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#cccccc',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 18,
-    marginBottom: 24,
-  },
-  payButton: {
-    minHeight: 48,
-    justifyContent: 'center',
+  checkoutContent: {
+    padding: 24,
   },
   savedCards: {
     marginBottom: 20,
