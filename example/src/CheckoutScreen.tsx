@@ -3,8 +3,10 @@ import Config from 'react-native-config';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   Button,
   Image,
+  PanResponder,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,7 +20,11 @@ import {
 } from 'paymob-reactnative';
 import {
   createIntention,
+  deleteSavedCard,
+  getSavedCards,
   getTransactionResult,
+  reorderSavedCards,
+  updateSavedCard,
   type SavedCard,
   type TransactionResult,
 } from './api/paymob';
@@ -29,11 +35,40 @@ const walletiiLogo = require('./assets/walletii-logo.png');
 const RIAL = '﷼'; // Omani Rial sign ﷼
 const FLAG = '🇴🇲'; // 🇴🇲
 const QUICK_ADD = [5, 10, 15, 20];
-const CURRENT_BALANCE = '163.100'; // cosmetic demo balance
+const BASE_BALANCE = 163.1; // cosmetic demo balance (OMR), shown before top-up
+const SAVED_CARD_ROW_H = 60; // saved-card tile height + gap (for drag math)
 
 // The rial glyph is Arabic (RTL); wrap it in an LTR isolate so it stays before
 // the number (e.g. "﷼ 5") instead of being reordered after it.
 const money = (v: string | number) => `⁦${RIAL}⁩ ${v}`;
+
+// Compact masked pan for the tiles, e.g. "•••• 2346".
+const last4 = (pan?: string) => {
+  const digits = (pan ?? '').replace(/\D/g, '');
+  return digits ? `•••• ${digits.slice(-4)}` : (pan ?? '');
+};
+
+// Small brand mark drawn from views (no icon library): Mastercard's two
+// overlapping circles, a "VISA" wordmark, or a neutral card for anything else.
+function CardBrandIcon({ type }: { type?: string }) {
+  const t = (type ?? '').toLowerCase();
+  if (t.includes('master')) {
+    return (
+      <View style={styles.brand}>
+        <View style={[styles.mcCircle, styles.mcRed]} />
+        <View style={[styles.mcCircle, styles.mcYellow]} />
+      </View>
+    );
+  }
+  if (t.includes('visa')) {
+    return (
+      <View style={styles.brand}>
+        <Text style={styles.visaText}>VISA</Text>
+      </View>
+    );
+  }
+  return <View style={[styles.brand, styles.brandGeneric]} />;
+}
 
 type SavedCardInfo = {
   maskedPan?: string;
@@ -120,13 +155,17 @@ const CUSTOMIZATION: Record<string, string> = {
 export default function CheckoutScreen() {
   const checkoutRef = useRef<PaymobCheckoutViewRef>(null);
   const referenceRef = useRef<string | null>(null);
-  const [amountText, setAmountText] = useState<string>('5');
+  const [amountText, setAmountText] = useState<string>('');
+  const [agreed, setAgreed] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
 
   // Accepts '.' or ',' as the decimal separator regardless of device locale.
   const amount = parseFloat(amountText.replace(',', '.')) || 0;
+  // Balance preview decreases by the entered amount (shows the base on load).
+  const balance = (BASE_BALANCE - amount).toFixed(3);
+  const canContinue = amount > 0 && agreed;
 
   const publicKey = Config.PAYMOB_PUBLIC_KEY ?? '';
 
@@ -146,6 +185,26 @@ export default function CheckoutScreen() {
     checkoutRef.current?.setPaymentKeys({ publicKey, clientSecret });
   }, [clientSecret, publicKey]);
 
+  // Load the saved cards for the top-up screen (and refresh when returning to it
+  // via "Start over"). Editing here happens before the intention is created, so
+  // changes also flow into the checkout via the intention's card tokens.
+  useEffect(() => {
+    if (clientSecret) {
+      return;
+    }
+    let active = true;
+    getSavedCards()
+      .then((cards) => {
+        if (active) {
+          setSavedCards(cards);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [clientSecret]);
+
   const handleContinue = async () => {
     if (amount <= 0) {
       Alert.alert('Choose an amount', 'Add an amount to top up first.');
@@ -154,16 +213,10 @@ export default function CheckoutScreen() {
 
     setLoading(true);
     try {
-      // Backend creates the intention (with the secret key) and returns the
-      // client secret, a reference we use to look up the result later, and the
-      // saved cards it knows about.
-      const {
-        clientSecret: secret,
-        reference,
-        savedCards: cards,
-      } = await createIntention(amount);
+      // Backend creates the intention (with the secret key, and the current
+      // saved-card tokens) and returns the client secret + a reference.
+      const { clientSecret: secret, reference } = await createIntention(amount);
       referenceRef.current = reference;
-      setSavedCards(cards);
       setClientSecret(secret);
     } catch (error: any) {
       Alert.alert('Could not start payment', error?.message ?? 'Unknown error');
@@ -176,11 +229,102 @@ export default function CheckoutScreen() {
     referenceRef.current = null;
     setClientSecret(null);
     setSavedCards([]);
-    setAmountText('5');
+    setAmountText('');
+    setAgreed(false);
   };
 
   const addAmount = (v: number) => {
     setAmountText(String(Math.round((amount + v) * 1000) / 1000));
+  };
+
+  // --- Drag to reorder saved cards ------------------------------------------
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const dragY = useRef(new Animated.Value(0)).current;
+
+  const makeDragResponder = (index: number) =>
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        setDragIndex(index);
+        dragY.setValue(0);
+      },
+      onPanResponderMove: (_e, g) => dragY.setValue(g.dy),
+      onPanResponderRelease: (_e, g) => {
+        const delta = Math.round(g.dy / SAVED_CARD_ROW_H);
+        setSavedCards((prev) => {
+          const to = Math.max(0, Math.min(prev.length - 1, index + delta));
+          if (to === index) {
+            return prev;
+          }
+          const next = prev.slice();
+          const [moved] = next.splice(index, 1);
+          if (!moved) {
+            return prev;
+          }
+          next.splice(to, 0, moved);
+          reorderSavedCards(
+            next.map((c) => c.token).filter((t): t is string => !!t)
+          ).catch(() => {});
+          return next;
+        });
+        setDragIndex(null);
+        dragY.setValue(0);
+      },
+      onPanResponderTerminate: () => {
+        setDragIndex(null);
+        dragY.setValue(0);
+      },
+    });
+
+  const renameCard = async (card: SavedCard, nickname: string) => {
+    if (!card.token) {
+      return;
+    }
+    try {
+      const updated = await updateSavedCard(card.token, nickname.trim());
+      setSavedCards((cards) =>
+        cards.map((c) =>
+          c.token === card.token ? { ...c, nickname: updated.nickname } : c
+        )
+      );
+    } catch (e: any) {
+      Alert.alert('Could not update card', e?.message ?? 'Unknown error');
+    }
+  };
+
+  const removeCard = async (card: SavedCard) => {
+    if (!card.token) {
+      return;
+    }
+    try {
+      await deleteSavedCard(card.token);
+      setSavedCards((cards) => cards.filter((c) => c.token !== card.token));
+    } catch (e: any) {
+      Alert.alert('Could not delete card', e?.message ?? 'Unknown error');
+    }
+  };
+
+  const openEditCard = (card: SavedCard) => {
+    Alert.prompt(
+      'Edit card',
+      `${card.cardType ?? 'Card'} ${card.maskedPan ?? ''}`.trim(),
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => removeCard(card),
+        },
+        {
+          text: 'Save',
+          onPress: (text?: string) => renameCard(card, text ?? ''),
+        },
+      ],
+      'plain-text',
+      card.nickname ?? '',
+      'default'
+    );
   };
 
   const handleSuccess = async (event: any) => {
@@ -243,19 +387,6 @@ export default function CheckoutScreen() {
           contentContainerStyle={styles.checkoutContent}
           keyboardShouldPersistTaps="handled"
         >
-          {savedCards.length > 0 && (
-            <View style={styles.savedCards}>
-              <Text style={styles.savedCardsTitle}>Saved cards</Text>
-              {savedCards.map((c, i) => (
-                <View key={c.token ?? String(i)} style={styles.savedCardRow}>
-                  <Text style={styles.savedCardType}>
-                    {c.cardType ?? 'Card'}
-                  </Text>
-                  <Text style={styles.savedCardPan}>{c.maskedPan ?? ''}</Text>
-                </View>
-              ))}
-            </View>
-          )}
           <PaymobCheckoutView
             ref={checkoutRef}
             style={styles.embedded}
@@ -304,7 +435,7 @@ export default function CheckoutScreen() {
         </View>
         <View style={styles.balanceBar}>
           <Text style={styles.balanceText}>
-            {`Current balance: ${money(CURRENT_BALANCE)}`}
+            {`Current balance: ${money(balance)}`}
           </Text>
         </View>
       </View>
@@ -321,22 +452,82 @@ export default function CheckoutScreen() {
         ))}
       </View>
 
+      {savedCards.length > 0 && (
+        <View style={styles.savedCards}>
+          <View style={styles.savedCardsHeader}>
+            <Text style={styles.savedCardsTitle}>Saved cards</Text>
+            {savedCards.length > 1 && (
+              <Text style={styles.savedCardsHint}>≡ drag to reorder</Text>
+            )}
+          </View>
+          {savedCards.map((c, i) => (
+            <Animated.View
+              key={c.token ?? String(i)}
+              style={[
+                styles.savedCardRow,
+                i === dragIndex && {
+                  transform: [{ translateY: dragY }],
+                  zIndex: 10,
+                  elevation: 6,
+                  shadowColor: '#000000',
+                  shadowOpacity: 0.15,
+                  shadowRadius: 8,
+                  shadowOffset: { width: 0, height: 3 },
+                },
+              ]}
+            >
+              <View style={styles.savedCardLeft}>
+                <CardBrandIcon type={c.cardType} />
+                <Text style={styles.savedCardType} numberOfLines={1}>
+                  {c.nickname || c.cardType || 'Card'}
+                </Text>
+              </View>
+              <View style={styles.savedCardRight}>
+                <Text style={styles.savedCardPan}>{last4(c.maskedPan)}</Text>
+                <TouchableOpacity
+                  style={styles.editBtn}
+                  onPress={() => openEditCard(c)}
+                  accessibilityLabel="Edit card"
+                >
+                  <Text style={styles.editIcon}>✎</Text>
+                </TouchableOpacity>
+                {savedCards.length > 1 && (
+                  <View
+                    style={styles.grip}
+                    accessibilityLabel="Drag to reorder"
+                    {...makeDragResponder(i).panHandlers}
+                  >
+                    <Text style={styles.gripIcon}>≡</Text>
+                  </View>
+                )}
+              </View>
+            </Animated.View>
+          ))}
+        </View>
+      )}
+
       <View style={styles.spacer} />
 
-      <View style={styles.secureNote}>
-        <View style={styles.shield}>
-          <Text style={styles.shieldCheck}>✓</Text>
+      <TouchableOpacity
+        style={styles.secureNote}
+        onPress={() => setAgreed((a) => !a)}
+        activeOpacity={0.7}
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: agreed }}
+      >
+        <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
+          {agreed && <Text style={styles.checkboxTick}>✓</Text>}
         </View>
         <Text style={styles.secureText}>
           You will be redirected to a secure payment page to enter your card
           details.
         </Text>
-      </View>
+      </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.continueBtn, amount <= 0 && styles.continueBtnDisabled]}
+        style={[styles.continueBtn, !canContinue && styles.continueBtnDisabled]}
         onPress={handleContinue}
-        disabled={loading || amount <= 0}
+        disabled={loading || !canContinue}
       >
         {loading ? (
           <ActivityIndicator color="#051926" />
@@ -475,15 +666,21 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     gap: 10,
   },
-  shield: {
+  checkbox: {
     width: 30,
     height: 30,
     borderRadius: 9,
-    backgroundColor: '#07F0D7',
+    borderWidth: 2,
+    borderColor: '#c4c4c4',
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  shieldCheck: {
+  checkboxChecked: {
+    backgroundColor: '#07F0D7',
+    borderColor: '#07F0D7',
+  },
+  checkboxTick: {
     fontSize: 16,
     fontWeight: '700',
     color: '#051926',
@@ -526,18 +723,29 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   savedCards: {
-    marginBottom: 20,
+    marginHorizontal: 20,
+    marginTop: 24,
+  },
+  savedCardsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
   savedCardsTitle: {
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 8,
+  },
+  savedCardsHint: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#9a9a9a',
   },
   savedCardRow: {
+    height: 52,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
     paddingHorizontal: 14,
     borderWidth: 1,
     borderColor: '#e0e0e0',
@@ -545,14 +753,74 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     backgroundColor: '#fafafa',
   },
+  savedCardLeft: {
+    flexShrink: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  brand: {
+    width: 34,
+    height: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandGeneric: {
+    width: 28,
+    height: 18,
+    borderRadius: 4,
+    backgroundColor: '#d4d4d4',
+  },
+  mcCircle: {
+    width: 15,
+    height: 15,
+    borderRadius: 8,
+  },
+  mcRed: {
+    backgroundColor: '#EB001B',
+  },
+  mcYellow: {
+    backgroundColor: '#F79E1B',
+    marginLeft: -6,
+  },
+  visaText: {
+    color: '#1A1F71',
+    fontSize: 13,
+    fontWeight: '700',
+    fontStyle: 'italic',
+    letterSpacing: -0.5,
+  },
   savedCardType: {
+    flexShrink: 1,
     fontSize: 15,
     fontWeight: '600',
     color: '#051926',
   },
+  savedCardRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginLeft: 12,
+  },
   savedCardPan: {
     fontSize: 15,
     color: '#555555',
+  },
+  editBtn: {
+    padding: 4,
+  },
+  editIcon: {
+    fontSize: 18,
+    color: '#0b8f83',
+  },
+  grip: {
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+  },
+  gripIcon: {
+    fontSize: 20,
+    color: '#b8b8b8',
   },
   embedded: {
     width: '100%',

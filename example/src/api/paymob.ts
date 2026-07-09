@@ -16,9 +16,65 @@ export interface SavedCard {
   token?: string;
   maskedPan?: string;
   cardType?: string;
+  nickname?: string | null;
+  order?: number | null;
   email?: string | null;
   reference?: string | null;
   receivedAt?: string;
+}
+
+/** Persists the display order of saved cards (tokens, top to bottom). */
+export async function reorderSavedCards(
+  tokens: string[]
+): Promise<SavedCard[]> {
+  const response = await fetch(`${BACKEND_URL}/saved-cards/order`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tokens }),
+  });
+  if (!response.ok) {
+    throw new Error(`Reorder failed (${response.status})`);
+  }
+  return (await response.json()) as SavedCard[];
+}
+
+/** Sets (or clears, with an empty string) a saved card's nickname. */
+export async function updateSavedCard(
+  token: string,
+  nickname: string
+): Promise<SavedCard> {
+  const response = await fetch(
+    `${BACKEND_URL}/saved-cards/${encodeURIComponent(token)}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname }),
+    }
+  );
+  if (!response.ok) {
+    throw new Error(`Update failed (${response.status})`);
+  }
+  return (await response.json()) as SavedCard;
+}
+
+/** Lists the saved cards known to the backend. */
+export async function getSavedCards(): Promise<SavedCard[]> {
+  const response = await fetch(`${BACKEND_URL}/saved-cards`);
+  if (!response.ok) {
+    throw new Error(`Saved cards lookup failed (${response.status})`);
+  }
+  return (await response.json()) as SavedCard[];
+}
+
+/** Deletes a saved card. */
+export async function deleteSavedCard(token: string): Promise<void> {
+  const response = await fetch(
+    `${BACKEND_URL}/saved-cards/${encodeURIComponent(token)}`,
+    { method: 'DELETE' }
+  );
+  if (!response.ok) {
+    throw new Error(`Delete failed (${response.status})`);
+  }
 }
 
 export interface CreateIntentionResult {
