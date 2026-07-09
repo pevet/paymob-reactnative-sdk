@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import Config from 'react-native-config';
 
 /**
@@ -5,12 +6,21 @@ import Config from 'react-native-config';
  * backend holds the secret key, creates the intention, receives Paymob's
  * webhook, and exposes the authoritative result for a transaction.
  *
- * The iOS simulator reaches the Mac host at localhost, so the default backend
- * URL is http://localhost:3000 (allowed by NSAllowsLocalNetworking).
+ * How the device reaches the Mac host differs per platform:
+ *  - iOS simulator shares the host network, so localhost works (permitted by
+ *    NSAllowsLocalNetworking in Info.plist).
+ *  - Android emulator maps the host to the special IP 10.0.2.2 (cleartext to it
+ *    is permitted by the debug network-security config).
+ * PAYMOB_BACKEND_URL in .env overrides this (e.g. a tunnel or a real device).
  */
-const BACKEND_URL = (
-  Config.PAYMOB_BACKEND_URL ?? 'http://localhost:3000'
-).replace(/\/$/, '');
+const DEFAULT_BACKEND_URL = Platform.select({
+  android: 'http://10.0.2.2:3000',
+  default: 'http://localhost:3000',
+});
+const BACKEND_URL = (Config.PAYMOB_BACKEND_URL || DEFAULT_BACKEND_URL).replace(
+  /\/$/,
+  ''
+);
 
 export interface SavedCard {
   token?: string;

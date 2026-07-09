@@ -8,6 +8,7 @@ import {
   Image,
   Modal,
   PanResponder,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -159,18 +160,28 @@ async function pollBackendResult(
 
 // Inline (embedded) checkout theming. Colors are hex strings.
 //
-// IMPORTANT: the native iOS SDK decodes this JSON with
-// Title_Case_With_Underscores keys (e.g. `Color_Primary`), which differ from
-// the Android SDK's camelCase keys (e.g. `colorPrimary`). This example targets
-// iOS, so the iOS key names are used here.
-const CUSTOMIZATION: Record<string, string> = {
-  Color_Container: '#FFF8E1', // embedded element background (gentle yellow)
-  Color_Primary: '#07F0D7', // payment button background (active)
-  Color_Disabled: '#C7CDD1', // payment button background (inactive/disabled)
-  Text_Color_For_Payment_Button: '#051926', // payment button text
-  Radius_Border: '8',
-  Payment_Button_Title: 'Continue',
-};
+// IMPORTANT: the two native SDKs decode this JSON with different key casing —
+// iOS uses Title_Case_With_Underscores (e.g. `Color_Primary`), Android uses
+// camelCase (e.g. `colorPrimary`, matching the AAR's UiCustomizationEmbedded).
+// Same values, keyed per platform so the theme applies on both.
+const CUSTOMIZATION = Platform.select<Record<string, string>>({
+  ios: {
+    Color_Container: '#FFF8E1', // embedded element background (gentle yellow)
+    Color_Primary: '#07F0D7', // payment button background (active)
+    Color_Disabled: '#C7CDD1', // payment button background (inactive/disabled)
+    Text_Color_For_Payment_Button: '#051926', // payment button text
+    Radius_Border: '8',
+    Payment_Button_Title: 'Continue',
+  },
+  default: {
+    colorContainer: '#FFF8E1',
+    colorPrimary: '#07F0D7',
+    colorDisabled: '#C7CDD1',
+    textColorForPaymentButton: '#051926',
+    radiusBorder: '8',
+    paymentButtonTitle: 'Continue',
+  },
+});
 
 export default function CheckoutScreen() {
   const checkoutRef = useRef<PaymobCheckoutViewRef>(null);
@@ -185,6 +196,8 @@ export default function CheckoutScreen() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
   const [pickerOpen, setPickerOpen] = useState<boolean>(false);
+  const [editingCard, setEditingCard] = useState<SavedCard | null>(null);
+  const [nicknameDraft, setNicknameDraft] = useState<string>('');
 
   // Accepts '.' or ',' as the decimal separator regardless of device locale.
   const amount = parseFloat(amountText.replace(',', '.')) || 0;
@@ -414,26 +427,31 @@ export default function CheckoutScreen() {
     }
   };
 
+  // Open the rename/delete sheet. Uses a cross-platform Modal (not Alert.prompt,
+  // which is iOS-only) so the same UI works on Android.
   const openEditCard = (card: SavedCard) => {
-    Alert.prompt(
-      'Edit card',
-      `${card.cardType ?? 'Card'} ${card.maskedPan ?? ''}`.trim(),
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => removeCard(card),
-        },
-        {
-          text: 'Save',
-          onPress: (text?: string) => renameCard(card, text ?? ''),
-        },
-      ],
-      'plain-text',
-      card.nickname ?? '',
-      'default'
-    );
+    setEditingCard(card);
+    setNicknameDraft(card.nickname ?? '');
+  };
+
+  const closeEditCard = () => {
+    setEditingCard(null);
+    setNicknameDraft('');
+  };
+
+  const saveEditCard = () => {
+    if (editingCard) {
+      renameCard(editingCard, nicknameDraft);
+    }
+    closeEditCard();
+  };
+
+  const deleteEditCard = () => {
+    const card = editingCard;
+    closeEditCard();
+    if (card) {
+      removeCard(card);
+    }
   };
 
   const handleSuccess = async (event: any) => {
@@ -777,6 +795,47 @@ export default function CheckoutScreen() {
           <Text style={styles.continueText}>Continue</Text>
         )}
       </TouchableOpacity>
+
+      <Modal
+        visible={!!editingCard}
+        transparent
+        animationType="fade"
+        onRequestClose={closeEditCard}
+      >
+        <View style={styles.editOverlay}>
+          <View style={styles.editCard}>
+            <Text style={styles.editTitle}>Edit card</Text>
+            <Text style={styles.editSubtitle}>
+              {`${editingCard?.cardType ?? 'Card'} ${
+                editingCard?.maskedPan ?? ''
+              }`.trim()}
+            </Text>
+            <TextInput
+              style={styles.editInput}
+              value={nicknameDraft}
+              onChangeText={setNicknameDraft}
+              placeholder="Nickname"
+              placeholderTextColor="#9a9a9a"
+              autoFocus
+              returnKeyType="done"
+              onSubmitEditing={saveEditCard}
+            />
+            <View style={styles.editButtons}>
+              <TouchableOpacity onPress={deleteEditCard} style={styles.editGhost}>
+                <Text style={styles.editDelete}>Delete</Text>
+              </TouchableOpacity>
+              <View style={styles.editRight}>
+                <TouchableOpacity onPress={closeEditCard} style={styles.editGhost}>
+                  <Text style={styles.editCancel}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={saveEditCard} style={styles.editSave}>
+                  <Text style={styles.editSaveText}>Save</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1183,5 +1242,76 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#111111',
+  },
+
+  // edit-card modal (cross-platform rename/delete)
+  editOverlay: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    paddingHorizontal: 28,
+  },
+  editCard: {
+    alignSelf: 'stretch',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 22,
+  },
+  editTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111111',
+  },
+  editSubtitle: {
+    marginTop: 4,
+    fontSize: 14,
+    color: '#6b6b6b',
+  },
+  editInput: {
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#c4c4c4',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#111111',
+  },
+  editButtons: {
+    marginTop: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  editRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  editGhost: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  editDelete: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#d11',
+  },
+  editCancel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#6b6b6b',
+  },
+  editSave: {
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 20,
+    backgroundColor: '#07F0D7',
+  },
+  editSaveText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#051926',
   },
 });
