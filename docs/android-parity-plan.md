@@ -161,13 +161,25 @@ intention-retrieval state emission reads the view binding after the hosting RN
 view has transiently detached it. It's a race (the same flow often renders
 cleanly), and it's SDK-internal.
 
-**Mitigation applied (app-side):** the embedded checkout is now hosted in a plain
-`View` instead of a `ScrollView`. The `ScrollView` re-measured its content every
-time the auto-sizing wrapper pushed a new height, and that churn was the main
-trigger for the transient detach behind the crash. After the change the crash did
-not reproduce in 22 consecutive runs (vs. roughly 1-in-4 before), with rendering
-intact. This narrows the race but cannot fully eliminate an SDK-internal crash —
-a proper fix still needs the SDK change described in the report.
+**Mitigation attempted (app-side, insufficient):** the embedded checkout is now
+hosted in a plain `View` instead of a `ScrollView`, which removed the auto-sizing
+layout churn and cut the enter-path crash rate (0 in 22 automated
+enter-and-wait runs, rendering intact). But interactive testing showed the
+mitigation is **not enough**: the `getBinding()` race still fires on the
+**Start over → re-enter** path (the view remounts), and the element still fails
+to render on some attempts.
+
+**Blocking issue — a third SDK bug:** tapping **Pay** on a new card crashes
+synchronously with a `NullPointerException` in
+`NewCardEmbeddedView.saveAndPay()` — the SDK leaves the new-card
+`paymentMethod` null and dereferences it. This is not app-fixable (the field is
+set and read entirely inside the SDK) and it blocks completing a payment on
+Android. Documented as Issue 3 in the report.
+
+**Conclusion:** with Paymob Android SDK 1.9.2 the embedded checkout cannot
+reliably render or complete a payment on Android, regardless of app-side changes.
+It needs upstream SDK fixes (Issues 1–3). The demo's Android embedded flow should
+be treated as non-functional until then.
 
 A version bump was investigated and is **not available**: 1.9.2 is the latest
 embedded Android SDK Paymob ships (both the upstream RN SDK and the Flutter SDK

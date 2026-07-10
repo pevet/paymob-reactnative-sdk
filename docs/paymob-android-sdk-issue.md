@@ -1,14 +1,17 @@
 # Paymob Android SDK — embedded checkout issues (1.9.2)
 
 A ready-to-file report for Paymob support / the `Paymob-SDK` Android maintainers,
-covering two issues with the embedded `PaymobCheckoutView`:
+covering three issues with the embedded `PaymobCheckoutView`:
 
 1. `uiCustomization` and `showAddNewCard` are not applied (below).
 2. An intermittent `NullPointerException` crash during intention retrieval
    ([Issue 2](#issue-2--intermittent-nullpointerexception-during-intention-retrieval)).
+3. A `NullPointerException` in `saveAndPay` when tapping Pay on a new card, which
+   blocks completing a payment
+   ([Issue 3](#issue-3--nullpointerexception-in-saveandpay-when-tapping-pay-new-card)).
 
-The iOS SDK applies the same configuration correctly and does not crash; only
-Android is affected.
+The iOS SDK applies the same configuration correctly and completes payments
+without crashing; only Android is affected.
 
 **Version note:** 1.9.2 is the latest embedded Android SDK Paymob ships — the
 upstream React Native SDK (vendored 2026-06-16) and the Flutter SDK (updated
@@ -148,6 +151,56 @@ dereferences a null binding and the process is killed.
 - Cancel the `observeStates` collection when the view detaches
   (`onDetachedFromWindow`) / tie it to the view's lifecycle, and/or
 - null-check the binding in the collector before use.
+
+## Issue 3 — `NullPointerException` in `saveAndPay` when tapping Pay (new card)
+
+Entering a card in the embedded new-card form and tapping **Pay** crashes
+synchronously (on the click, before 3-D Secure):
+
+```
+FATAL EXCEPTION: main
+java.lang.NullPointerException
+    at com.paymob.paymob_sdk.ui.embedded.new_card.NewCardEmbeddedView.saveAndPay(NewCardEmbeddedView.kt:516)
+    at com.paymob.paymob_sdk.ui.embedded.PaymobCheckoutView.setClickListener$lambda$1(PaymobCheckoutView.kt:192)
+    at android.view.View.performClick(View.java:8028)
+    ...
+```
+
+### Diagnosis
+
+At `NewCardEmbeddedView.kt:516` the code runs
+`viewModel.payCard(paymentMethod.getKey(), tenure)` with an
+`Intrinsics.checkNotNull(paymentMethod)` immediately before it — so the crash is
+`this.paymentMethod` (a `PaymentMethod`) being **null** at Pay time. The SDK
+never populated the new-card view's `paymentMethod`, then dereferences it.
+
+### Payload (looks correct; iOS accepts it)
+
+The intention is created with a card integration and full billing data:
+
+```
+payment_methods: [70072]      // Oman card (MIGS/MPGS) integration
+currency: "OMR"
+billing_data: { first_name, last_name, phone_number, email }
+card_tokens: [ ...saved-card tokens... ]   // embedded flow offers saved cards + new card
+```
+
+The same intention completes payment on the iOS SDK. Only the Android SDK leaves
+`paymentMethod` null and crashes.
+
+### Impact
+
+This blocks completing a **new-card** payment in the embedded checkout on
+Android entirely — it is not an intermittent race like Issue 2; Pay crashes on
+the click. It cannot be worked around from the host app, since `paymentMethod` is
+set and read entirely inside the SDK.
+
+### Question
+
+- Under what conditions does the embedded new-card view set `paymentMethod`, and
+  why would it be null at Pay time for an intention that has a valid card
+  integration in `payment_methods`? Does the presence of `card_tokens` (mixed
+  saved-card + new-card checkout) affect new-card `paymentMethod` initialization?
 
 ## Questions for Paymob
 
