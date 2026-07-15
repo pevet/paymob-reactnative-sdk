@@ -138,6 +138,24 @@ element display just that card, keeping CVV/3-D Secure inside Paymob's UI.
 | `DELETE /saved-cards/:token` | Remove a saved card. |
 | `PUT /saved-cards/order` | Set the display order (array of tokens). |
 
+## Platform status — Android embedded checkout
+
+The flows above are verified on **iOS**. On **Android** the embedded checkout is
+currently **not usable** due to three bugs inside the Paymob Android SDK 1.9.2
+(the latest Paymob ships) — not in this app or its bridge:
+
+- customization / `showAddNewCard` ignored —
+  [report](docs/paymob-android-issue-1-embedded-customization.md);
+- `getBinding()` `NullPointerException` on render / re-entry (partially mitigated
+  app-side) — [report](docs/paymob-android-issue-2-getbinding-crash.md);
+- `saveAndPay()` `NullPointerException` on Pay, which blocks completing a payment
+  — [report](docs/paymob-android-issue-3-saveandpay-crash.md).
+
+Overview and severities: [`docs/paymob-android-sdk-issue.md`](docs/paymob-android-sdk-issue.md);
+demo impact and decisions: [`docs/android-parity-plan.md`](docs/android-parity-plan.md).
+The rest of the Android app (flows, dropdown, backend calls) works; only the
+embedded element is affected.
+
 ## Not production
 
 This is a demo: in-memory transaction results, a local JSON store, test

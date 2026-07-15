@@ -14,6 +14,15 @@ to make it production-grade. See [`ARCHITECTURE.md`](../ARCHITECTURE.md) for the
 end-to-end picture and [`docs/saved-card-flow-spec.md`](saved-card-flow-spec.md)
 for the user journeys.
 
+> **Testing note:** the backend is platform-agnostic and unaffected by the
+> client-side SDK bugs, but end-to-end testing currently works only on **iOS** —
+> the **Android** embedded checkout is blocked by three Paymob Android SDK 1.9.2
+> defects (crashes on Pay / render, customization ignored). See the reports filed
+> with Paymob: [issue 1](paymob-android-issue-1-embedded-customization.md),
+> [issue 2](paymob-android-issue-2-getbinding-crash.md),
+> [issue 3](paymob-android-issue-3-saveandpay-crash.md)
+> ([overview](paymob-android-sdk-issue.md)).
+
 ## 1. What the backend is responsible for
 
 1. **Hold the Paymob secret key.** It is used only here, only to create

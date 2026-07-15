@@ -191,13 +191,40 @@ iOS-only.
   automatically; on Android its `dotenv.gradle` hook (and, under some RN
   versions, manual linking) is required.
 - **iOS** completes the embedded flow and applies customization correctly.
-- **Android — Paymob SDK 1.9.2 is currently unreliable for the embedded
-  checkout:** customization/`showAddNewCard` are ignored, and it crashes on
-  render/re-entry and on tapping Pay. These are SDK-internal defects (not fixable
-  from the app) — details and status in
-  [`docs/paymob-android-sdk-issue.md`](paymob-android-sdk-issue.md) and
-  [`docs/android-parity-plan.md`](android-parity-plan.md). Plan Android rollout of
-  the embedded checkout around a fixed SDK release.
+
+### Known Paymob Android SDK 1.9.2 bugs (embedded checkout)
+
+Interactive Android testing surfaced **three** defects, all **inside the Paymob
+Android AAR** (`com.paymob.paymob_sdk.*`) — none is fixable from the app or the RN
+bridge, and iOS is unaffected by all three. Each is written up as a standalone
+report filed with Paymob:
+
+- **Bug 1 — customization ignored** (severity: medium). `uiCustomization` and
+  `showAddNewCard` have no effect: the button stays the default blue "Pay", the
+  container color isn't applied, and the new-card form shows even when the
+  intention is scoped to a single card. The RN bridge is confirmed to pass the
+  config correctly. → report:
+  [`paymob-android-issue-1-embedded-customization.md`](paymob-android-issue-1-embedded-customization.md)
+- **Bug 2 — `getBinding()` crash on render/re-entry** (severity: high).
+  Intermittent `NullPointerException` in
+  `PaymobCheckoutView.getBinding()` ~1–2s after `setPaymentKeys`, when the
+  intention finishes loading — most reliably on **Start over → re-enter**. The SDK
+  reads its view binding after a transient detach. App-side mitigation (hosting the
+  element in a plain `View`, not a `ScrollView`) **reduced but did not eliminate**
+  it. → report:
+  [`paymob-android-issue-2-getbinding-crash.md`](paymob-android-issue-2-getbinding-crash.md)
+- **Bug 3 — `saveAndPay()` crash on Pay** (severity: **blocker**). Tapping **Pay**
+  on a new card throws a synchronous `NullPointerException` in
+  `NewCardEmbeddedView.saveAndPay()` (the SDK leaves `paymentMethod` null). This
+  **blocks completing a payment** and is not app-fixable. → report:
+  [`paymob-android-issue-3-saveandpay-crash.md`](paymob-android-issue-3-saveandpay-crash.md)
+
+There is **no newer SDK to upgrade to** — 1.9.2 is the latest Paymob ships (the
+upstream RN and Flutter SDKs both pin it; it's not on Maven Central or JitPack),
+so all three need an upstream fix. Overview and severities:
+[`paymob-android-sdk-issue.md`](paymob-android-sdk-issue.md); demo impact,
+mitigation, and decisions: [`android-parity-plan.md`](android-parity-plan.md).
+**Plan the Android rollout of the embedded checkout around a fixed SDK release.**
 
 ## 10. Reference
 
