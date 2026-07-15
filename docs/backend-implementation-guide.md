@@ -93,7 +93,42 @@ The authoritative result the app polls after payment.
 }
 ```
 
-## 4. Creating the intention (backend → Paymob)
+## 4. Authentication & customer scoping
+
+The demo endpoints are unauthenticated and share **one global** saved-card store.
+Production must authenticate every app-facing request and scope **all** state to
+the authenticated customer.
+
+**How.** Reuse the app's existing auth: the app sends `Authorization: Bearer
+<token>` (session/JWT) on every call and the backend validates it to a
+`customerId`. The request/response **bodies stay exactly as in §3** — the only
+additions are the header and server-side scoping. A missing/invalid token → `401`.
+
+**Per-endpoint ownership rules:**
+
+| Endpoint | Rule once per-customer |
+| --- | --- |
+| `POST /intentions` | Derive `card_tokens` from **this customer's** cards. If the client sends a `cardTokens` scope, **validate every token belongs to the customer** (else `403`). Take the amount from a **server-side order/cart** owned by the customer — never trust the client amount for a real charge. Fill `billing_data` from the customer profile. **Record `customerId` with the `reference`/order id** (see below). |
+| `GET /tx/:reference` | The `reference` must belong to the authenticated customer (stored at creation) — else `404`. |
+| `GET /saved-cards` | Return only this customer's cards. |
+| `PATCH` / `DELETE /saved-cards/:token` | Verify the token belongs to the customer — else `404`/`403`. |
+| `PUT /saved-cards/order` | Every token in the array must belong to the customer. |
+
+**The webhook is the exception.** `POST /paymob/webhook` is called by Paymob, not
+the customer — there is no session, so it is authenticated by **HMAC** (§6), and
+the customer is resolved from an association you store at intention creation:
+
+- When you create an intention, persist `{ reference, orderId, customerId }`.
+- On `TRANSACTION`, look up the customer by `reference` / `orderId` and fulfil
+  **that** customer's order.
+- On `TOKEN`, attribute the saved card to the **same** customer — store it under
+  their `customerId`, never in a shared list.
+
+**Token ownership:** a card `token` is only ever meaningful for the customer who
+created it. Never return, charge, or expose a token across customers — resolve
+`customerId` first, then filter by it.
+
+## 5. Creating the intention (backend → Paymob)
 
 `POST https://oman.paymob.com/v1/intention/` (Oman; swap host per region)
 
@@ -101,7 +136,7 @@ The authoritative result the app polls after payment.
 - **Body:**
 ```jsonc
 {
-  "amount": 5000,                       // smallest subunit (see §6)
+  "amount": 5000,                       // smallest subunit (see §7)
   "currency": "OMR",
   "payment_methods": [70072],           // your card integration id(s)
   "card_tokens": ["..."],               // saved-card tokens to offer (or [])
@@ -120,7 +155,7 @@ The authoritative result the app polls after payment.
 - Seed your store with `{ reference, status: "Created" }` so the poll gets a
   definite "not settled yet" answer before webhooks arrive.
 
-## 5. Webhooks (the source of truth)
+## 6. Webhooks (the source of truth)
 
 Paymob POSTs to `notification_url` with `{ type, obj }` and an `hmac` query
 param. Two types matter:
@@ -152,19 +187,19 @@ for the exact field list per type.
 Return `200` quickly; do the persistence/side effects idempotently (Paymob
 retries, and may deliver duplicates or out-of-order).
 
-## 6. Amounts & currency
+## 7. Amounts & currency
 
 OMR has **3 decimal places**. Paymob expects the smallest subunit (baisa):
 `subunit = round(amountOMR * 1000)` (e.g. `5.000 OMR → 5000`). Adjust the
 multiplier per currency (EGP/AED use 2 decimals → ×100). **Never trust the amount
 from the client for a real charge** — derive it from a server-side order/cart.
 
-## 7. Production hardening — what must change from the demo
+## 8. Production hardening — what must change from the demo
 
 The demo cuts corners a production service cannot:
 
-- [ ] **Authenticate the customer** on every endpoint, and **scope saved cards to
-      that customer.** The demo has one global card store shared by everyone.
+- [ ] **Authenticate the customer and scope all state to them** — see §4. The
+      demo has no auth and one global card store shared by everyone.
 - [ ] **Verify the webhook HMAC** on every callback (demo makes it optional).
 - [ ] **Use a real datastore** (Postgres/etc.) instead of in-memory maps + a
       local JSON file. Transaction results and card records must be durable and
@@ -179,7 +214,7 @@ The demo cuts corners a production service cannot:
 - [ ] **Rate-limit / validate** intention creation; tie each intention to an
       authenticated user and a server-derived amount.
 
-## 8. Reference
+## 9. Reference
 
 - Demo backend: [`example/server/index.js`](../example/server/index.js) and its
   [`README`](../example/server/README.md).
