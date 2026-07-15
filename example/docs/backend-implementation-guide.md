@@ -8,9 +8,9 @@
 
 This describes the backend the mobile app talks to. The app **never** calls
 Paymob directly — it only calls this service. A working reference implementation
-lives in [`example/server/index.js`](../example/server/index.js) (a demo: in-memory
+lives in [`example/server/index.js`](../server/index.js) (a demo: in-memory
 stores, optional HMAC, no auth). This guide is the contract plus what must change
-to make it production-grade. See [`ARCHITECTURE.md`](../ARCHITECTURE.md) for the
+to make it production-grade. See [`ARCHITECTURE.md`](../../ARCHITECTURE.md) for the
 end-to-end picture and [`docs/saved-card-flow-spec.md`](saved-card-flow-spec.md)
 for the user journeys.
 
@@ -51,7 +51,7 @@ URL, the card integration id(s), and the region base URL.
 ## 3. API contract the app depends on
 
 These request/response shapes are what the app's
-[`api/paymob.ts`](../example/src/api/paymob.ts) expects — keep them stable.
+[`api/paymob.ts`](../src/api/paymob.ts) expects — keep them stable.
 
 ### `POST /intentions`
 Create an intention for a top-up.
@@ -216,8 +216,8 @@ The demo cuts corners a production service cannot:
 
 ## 9. Reference
 
-- Demo backend: [`example/server/index.js`](../example/server/index.js) and its
-  [`README`](../example/server/README.md).
-- End-to-end flows and diagrams: [`ARCHITECTURE.md`](../ARCHITECTURE.md).
+- Demo backend: [`example/server/index.js`](../server/index.js) and its
+  [`README`](../server/README.md).
+- End-to-end flows and diagrams: [`ARCHITECTURE.md`](../../ARCHITECTURE.md).
 - User journeys / acceptance criteria:
   [`docs/saved-card-flow-spec.md`](saved-card-flow-spec.md).

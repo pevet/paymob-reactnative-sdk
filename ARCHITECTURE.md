@@ -145,14 +145,14 @@ currently **not usable** due to three bugs inside the Paymob Android SDK 1.9.2
 (the latest Paymob ships) — not in this app or its bridge:
 
 - customization / `showAddNewCard` ignored —
-  [report](docs/paymob-android-issue-1-embedded-customization.md);
+  [report](example/docs/paymob-android-issue-1-embedded-customization.md);
 - `getBinding()` `NullPointerException` on render / re-entry (partially mitigated
-  app-side) — [report](docs/paymob-android-issue-2-getbinding-crash.md);
+  app-side) — [report](example/docs/paymob-android-issue-2-getbinding-crash.md);
 - `saveAndPay()` `NullPointerException` on Pay, which blocks completing a payment
-  — [report](docs/paymob-android-issue-3-saveandpay-crash.md).
+  — [report](example/docs/paymob-android-issue-3-saveandpay-crash.md).
 
-Overview and severities: [`docs/paymob-android-sdk-issue.md`](docs/paymob-android-sdk-issue.md);
-demo impact and decisions: [`docs/android-parity-plan.md`](docs/android-parity-plan.md).
+Overview and severities: [`example/docs/paymob-android-sdk-issue.md`](example/docs/paymob-android-sdk-issue.md);
+demo impact and decisions: [`example/docs/android-parity-plan.md`](example/docs/android-parity-plan.md).
 The rest of the Android app (flows, dropdown, backend calls) works; only the
 embedded element is affected.
 

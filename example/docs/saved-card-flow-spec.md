@@ -9,8 +9,8 @@
 | Flow       | Saved cards         |
 
 > Scope: this describes the **Saved cards** journey in the demo app
-> ([`example/`](../example)) and its supporting backend
-> ([`example/server/`](../example/server)). See [`ARCHITECTURE.md`](../ARCHITECTURE.md)
+> ([`example/`](..)) and its supporting backend
+> ([`example/server/`](../server)). See [`ARCHITECTURE.md`](../../ARCHITECTURE.md)
 > for how the pieces fit together, and the sibling embedded-checkout journey it
 > contrasts with.
 

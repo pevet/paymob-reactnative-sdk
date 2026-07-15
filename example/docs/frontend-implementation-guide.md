@@ -9,9 +9,9 @@
 This describes how the app integrates payments. The app talks **only to your
 backend** (never to Paymob directly for creating intentions) and renders Paymob's
 **embedded** checkout element for card entry + 3-D Secure. A full reference
-implementation lives in [`example/src/CheckoutScreen.tsx`](../example/src/CheckoutScreen.tsx)
-and [`example/src/api/paymob.ts`](../example/src/api/paymob.ts). See
-[`ARCHITECTURE.md`](../ARCHITECTURE.md) for the end-to-end picture, the
+implementation lives in [`example/src/CheckoutScreen.tsx`](../src/CheckoutScreen.tsx)
+and [`example/src/api/paymob.ts`](../src/api/paymob.ts). See
+[`ARCHITECTURE.md`](../../ARCHITECTURE.md) for the end-to-end picture, the
 [backend guide](backend-implementation-guide.md) for the service side, and the
 [saved-card spec](saved-card-flow-spec.md) for the journeys.
 
@@ -128,7 +128,7 @@ const CUSTOMIZATION = Platform.select<Record<string, string>>({
 });
 ```
 Colors are hex strings; sizes/radius/weights are passed as strings too. The full
-key list is in [`src/index.d.ts`](../src/index.d.ts)
+key list is in [`src/index.d.ts`](../../src/index.d.ts)
 (`PaymobEmbeddedCustomization`).
 
 ## 6. Scoping which cards the checkout offers
@@ -165,7 +165,7 @@ async function handleSuccess(event) {
 Poll `GET /tx/:reference` until a terminal status (`Success`/`Failed`/`Pending`)
 lands. The saved-card `TOKEN` webhook trails the `TRANSACTION` one by a few
 seconds, so keep polling briefly after the status settles to pick up the card.
-See `pollBackendResult` in [`CheckoutScreen.tsx`](../example/src/CheckoutScreen.tsx).
+See `pollBackendResult` in [`CheckoutScreen.tsx`](../src/CheckoutScreen.tsx).
 
 ## 8. Saved-card management
 
@@ -185,7 +185,7 @@ iOS-only.
 
 - **Networking to a local backend:** the iOS simulator reaches the host at
   `localhost`; the Android emulator uses `10.0.2.2`. `Platform.select` the base
-  URL (see [`api/paymob.ts`](../example/src/api/paymob.ts)); debug builds need
+  URL (see [`api/paymob.ts`](../src/api/paymob.ts)); debug builds need
   cleartext allowed for the local host.
 - **Env (`Config.*`):** iOS gets `react-native-config` via CocoaPods
   automatically; on Android its `dotenv.gradle` hook (and, under some RN
@@ -228,7 +228,7 @@ mitigation, and decisions: [`android-parity-plan.md`](android-parity-plan.md).
 
 ## 10. Reference
 
-- Component usage & flows: [`example/src/CheckoutScreen.tsx`](../example/src/CheckoutScreen.tsx)
-- Backend client: [`example/src/api/paymob.ts`](../example/src/api/paymob.ts)
-- Typed SDK API: [`src/index.d.ts`](../src/index.d.ts)
-- End-to-end architecture: [`ARCHITECTURE.md`](../ARCHITECTURE.md)
+- Component usage & flows: [`example/src/CheckoutScreen.tsx`](../src/CheckoutScreen.tsx)
+- Backend client: [`example/src/api/paymob.ts`](../src/api/paymob.ts)
+- Typed SDK API: [`src/index.d.ts`](../../src/index.d.ts)
+- End-to-end architecture: [`ARCHITECTURE.md`](../../ARCHITECTURE.md)

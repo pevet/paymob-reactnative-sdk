@@ -1,7 +1,7 @@
 # Documentation
 
 Docs for the **walletii payments demo** — the React Native example app in
-[`example/`](../example) and its backend in [`example/server/`](../example/server),
+[`example/`](..) and its backend in [`example/server/`](../server),
 built on the `paymob-reactnative` SDK. The demo covers a wallet top-up with two
 payment journeys (embedded Paymob checkout and an app-steered saved-card flow),
 saved-card management, and webhook-confirmed results.
@@ -14,7 +14,7 @@ side (backend or frontend)**.
 | Doc | What it's for |
 | --- | --- |
 | [Running the demo](running-the-demo.md) | Step-by-step to run it on the iOS simulator: Cloudflare tunnel, backend, Metro, app — and how the pieces wire together. |
-| [Architecture](../ARCHITECTURE.md) | The big picture: the two payment flows, webhook-as-source-of-truth, components, endpoints, and Android platform status. |
+| [Architecture](../../ARCHITECTURE.md) | The big picture: the two payment flows, webhook-as-source-of-truth, components, endpoints, and Android platform status. |
 
 ## Implementation guides
 
@@ -43,9 +43,9 @@ side (backend or frontend)**.
 
 | Doc | What it's for |
 | --- | --- |
-| [SDK README](../README.md) | Installing and using the `paymob-reactnative` package. |
-| [Example app README](../example/README.md) | The example app itself. |
-| [Backend README](../example/server/README.md) | Running the demo backend (incl. the tunnel requirement). |
+| [SDK README](../../README.md) | Installing and using the `paymob-reactnative` package. |
+| [Example app README](../README.md) | The example app itself. |
+| [Backend README](../server/README.md) | Running the demo backend (incl. the tunnel requirement). |
 
 ---
 

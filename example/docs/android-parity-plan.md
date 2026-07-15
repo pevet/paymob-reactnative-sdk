@@ -6,9 +6,9 @@
 | Status   | Implemented & verified — one SDK-side limitation (see Outcome) |
 | Goal     | Android runs both payment flows at feature parity with iOS |
 
-> Scope: the demo in [`example/`](../example). The published SDK's native
+> Scope: the demo in [`example/`](..). The published SDK's native
 > Android bridge already exists; this plan is about the **example app** and its
-> build/runtime wiring. See [`ARCHITECTURE.md`](../ARCHITECTURE.md) and
+> build/runtime wiring. See [`ARCHITECTURE.md`](../../ARCHITECTURE.md) and
 > [`docs/saved-card-flow-spec.md`](saved-card-flow-spec.md) for what "parity"
 > means functionally.
 
@@ -32,10 +32,10 @@ platform-specific JS details, not native code.
 ## How iOS handles each gap today (the target behaviour)
 
 - **Env** — `react-native-config` 1.6.1 is a CocoaPod (autolinked); its build
-  phase reads [`example/.env`](../example/.env) and populates `Config.*` with no
+  phase reads [`example/.env`](../.env) and populates `Config.*` with no
   extra setup.
 - **Customization** — `CUSTOMIZATION` in
-  [`CheckoutScreen.tsx`](../example/src/CheckoutScreen.tsx) is a JSON string with
+  [`CheckoutScreen.tsx`](../src/CheckoutScreen.tsx) is a JSON string with
   the iOS SDK's `Title_Case_With_Underscores` keys.
 - **Networking** — the iOS simulator shares the Mac's network, so
   `http://localhost:3000` hits the host backend; `Info.plist` sets
@@ -48,7 +48,7 @@ platform-specific JS details, not native code.
 ## Decisions (locked)
 
 - **D1 — App → backend on Android: `10.0.2.2` + cleartext.**
-  `Platform.select` in [`api/paymob.ts`](../example/src/api/paymob.ts) so Android
+  `Platform.select` in [`api/paymob.ts`](../src/api/paymob.ts) so Android
   defaults to `http://10.0.2.2:3000` (the emulator's alias for the host); iOS
   stays on `localhost`. A **debug-only** `network_security_config.xml` permits
   cleartext to `10.0.2.2` / `localhost`. Chosen for stability across restarts and
