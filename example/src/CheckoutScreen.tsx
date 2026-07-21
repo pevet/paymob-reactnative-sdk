@@ -547,6 +547,12 @@ export default function CheckoutScreen() {
           />
         </View>
         <View style={[styles.container, styles.checkoutContent]}>
+          {(scopedToSavedCard ||
+            (flow === 'embedded' && savedCards.length > 0)) && (
+            <Text style={styles.checkoutTitle}>
+              Tap saved card and enter CVV to pay
+            </Text>
+          )}
           <PaymobCheckoutView
             ref={checkoutRef}
             style={styles.embedded}
@@ -1050,6 +1056,12 @@ const styles = StyleSheet.create({
   },
   checkoutContent: {
     padding: 24,
+  },
+  checkoutTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#051926',
+    marginBottom: 14,
   },
 
   // saved cards
