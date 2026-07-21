@@ -552,7 +552,10 @@ export default function CheckoutScreen() {
   }
 
   // ---- Top-up screen -------------------------------------------------------
-  const showCards = flow === 'saved' || savedCards.length > 0;
+  // Only show the card UI once there's at least one saved card: the app-driven
+  // "Pay with" dropdown is hidden until a card exists (with none, the flow just
+  // defaults to a new card), and the embedded flow's list is likewise empty-safe.
+  const showCards = savedCards.length > 0;
   const selectedCard = savedCards.find((c) => c.token === selected) ?? null;
   return (
     <View style={styles.screen}>
