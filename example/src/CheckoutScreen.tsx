@@ -32,6 +32,8 @@ import {
 
 // walletii by Ooredoo brand logo, shown on the checkout screen's header banner.
 const walletiiLogo = require('./assets/walletii-logo.png');
+// Cyan shield-with-check, shown next to the secure-payment note.
+const shieldIcon = require('./assets/shield-check.png');
 
 const RIAL = '﷼'; // Omani Rial sign ﷼
 const FLAG = '🇴🇲'; // 🇴🇲
@@ -188,7 +190,6 @@ export default function CheckoutScreen() {
   const [screen, setScreen] = useState<Screen>('select');
   const [flow, setFlow] = useState<Flow>('embedded');
   const [amountText, setAmountText] = useState<string>('');
-  const [agreed, setAgreed] = useState<boolean>(false);
   const [selected, setSelected] = useState<Selection>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [processing, setProcessing] = useState<boolean>(false);
@@ -203,7 +204,7 @@ export default function CheckoutScreen() {
   // Balance preview decreases by the entered amount (shows the base on load).
   const balance = (BASE_BALANCE - amount).toFixed(3);
   const hasSelection = flow === 'embedded' || selected != null;
-  const canContinue = amount > 0 && agreed && hasSelection;
+  const canContinue = amount > 0 && hasSelection;
 
   const publicKey = Config.PAYMOB_PUBLIC_KEY ?? '';
 
@@ -256,7 +257,6 @@ export default function CheckoutScreen() {
     setSelected(null);
     setPickerOpen(false);
     setAmountText('');
-    setAgreed(false);
     setScreen('select');
   };
 
@@ -265,7 +265,6 @@ export default function CheckoutScreen() {
     setSelected(null);
     setPickerOpen(false);
     setAmountText('');
-    setAgreed(false);
     setScreen('topup');
   };
 
@@ -766,21 +765,17 @@ export default function CheckoutScreen() {
 
       <View style={styles.spacer} />
 
-      <TouchableOpacity
-        style={styles.secureNote}
-        onPress={() => setAgreed((a) => !a)}
-        activeOpacity={0.7}
-        accessibilityRole="checkbox"
-        accessibilityState={{ checked: agreed }}
-      >
-        <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-          {agreed && <Text style={styles.checkboxTick}>✓</Text>}
-        </View>
+      <View style={styles.secureNote}>
+        <Image
+          style={styles.shieldIcon}
+          source={shieldIcon}
+          resizeMode="contain"
+        />
         <Text style={styles.secureText}>
           You will be redirected to a secure payment page to enter your card
           details.
         </Text>
-      </TouchableOpacity>
+      </View>
 
       <TouchableOpacity
         style={[styles.continueBtn, !canContinue && styles.continueBtnDisabled]}
@@ -991,24 +986,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     gap: 10,
   },
-  checkbox: {
+  shieldIcon: {
     width: 30,
     height: 30,
-    borderRadius: 9,
-    borderWidth: 2,
-    borderColor: '#c4c4c4',
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: '#07F0D7',
-    borderColor: '#07F0D7',
-  },
-  checkboxTick: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#051926',
   },
   secureText: {
     flex: 1,
