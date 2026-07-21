@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
-  Button,
   Image,
   Modal,
   PanResponder,
@@ -258,6 +257,13 @@ export default function CheckoutScreen() {
     setPickerOpen(false);
     setAmountText('');
     setScreen('select');
+  };
+
+  // Leave the embedded checkout and return to the amount-entry screen, keeping
+  // the entered amount, flow, and card selection intact.
+  const backToAmount = () => {
+    referenceRef.current = null;
+    setClientSecret(null);
   };
 
   const chooseFlow = (f: Flow) => {
@@ -527,6 +533,13 @@ export default function CheckoutScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.banner}>
+          <TouchableOpacity
+            style={styles.bannerBack}
+            onPress={backToAmount}
+            accessibilityLabel="Back"
+          >
+            <Text style={styles.bannerBackChevron}>‹</Text>
+          </TouchableOpacity>
           <Image
             style={styles.logo}
             source={walletiiLogo}
@@ -541,9 +554,6 @@ export default function CheckoutScreen() {
             onFailure={handleFailure}
             onPending={handlePending}
           />
-          <View style={styles.resetButton}>
-            <Button title="Start over" onPress={goToSelect} color="#888888" />
-          </View>
         </View>
         <ProcessingModal visible={processing} />
       </View>
@@ -1020,6 +1030,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 20,
   },
+  bannerBack: {
+    position: 'absolute',
+    left: 12,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    zIndex: 1,
+  },
+  bannerBackChevron: {
+    fontSize: 34,
+    color: '#ffffff',
+    marginTop: -3,
+  },
   logo: {
     height: 48,
     width: 160,
@@ -1197,10 +1221,6 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 16,
   },
-  resetButton: {
-    marginTop: 8,
-  },
-
   // payment-in-progress overlay
   processingOverlay: {
     flex: 1,
