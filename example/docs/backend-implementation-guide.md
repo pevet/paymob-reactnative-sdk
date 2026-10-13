@@ -214,7 +214,56 @@ The demo cuts corners a production service cannot:
 - [ ] **Rate-limit / validate** intention creation; tie each intention to an
       authenticated user and a server-derived amount.
 
-## 9. Reference
+## 9. Embedded SDK checkout vs Unified web checkout
+
+This demo uses the **SDK embedded checkout** (`PaymobCheckoutView`). Paymob also
+offers the **Unified (web) Checkout**, a hosted page opened in a browser or
+WebView. Most of the backend is shared; the web checkout adds one concern, a
+return handler.
+
+**Identical in both**
+
+- **Intention creation:** the same `POST /v1/intention/` with the secret key and
+  the same body (§5): subunit amount, `currency`, `payment_methods`,
+  `billing_data`, `special_reference`, `notification_url`, plus `card_tokens` to
+  offer saved cards.
+- **Webhooks:** the same `TRANSACTION` + `TOKEN` callbacks to
+  `notification_url`, the same order-id correlation, the same HMAC check (§6).
+  The webhook is the source of truth in both.
+- **Saved cards (CIT):** `card_tokens` pre-loads them in both; the customer still
+  enters CVV and completes 3-D Secure in Paymob's UI.
+- **Auth and customer scoping** (§4) and **amounts** (§7) are unchanged.
+
+**What differs**
+
+| | SDK embedded checkout | Unified web checkout |
+| --- | --- | --- |
+| Handed to the client | `client_secret` (the app adds the public key) | A **checkout URL**: `https://<region-host>/unifiedcheckout/?publicKey=…&clientSecret=…`, built server-side or by the app from `client_secret` |
+| `redirection_url` on the intention | Not needed | **Required**: Paymob sends the browser there after payment |
+| Extra backend endpoint | None | A **return handler** at `redirection_url` |
+| Return payload | — | A GET with transaction query params (transaction id, success/pending flags, order / merchant reference, amount) and an `hmac` |
+| Getting back to the app | The SDK fires callbacks in-app | The return page hands control back via a **deep link / universal link** carrying your reference, or the app intercepts the redirect in its WebView or auth session |
+| Public URLs (local dev) | Only `notification_url` (the tunnel) | `notification_url` **and** `redirection_url` must be public HTTPS, since the device browser loads the return URL |
+| Checkout styling | Per request, in the app (`uiCustomization`) | Paymob dashboard checkout settings |
+| Region host | Resolved by the SDK | Use the account's host in the checkout URL (Oman: `oman.paymob.com`; Paymob's collection examples use `accept.paymob.com`) |
+
+**Rules for the web checkout's return handler**
+
+- **Verify the return `hmac`** before trusting any query parameter.
+- **Never fulfil from the redirect.** It can be lost (the user closes the tab) or
+  replayed. Use it to show a result page and route the user back; credit the
+  wallet only from the verified `TRANSACTION` webhook.
+- **Correlate by `special_reference` and stay idempotent**: the redirect and the
+  webhook can arrive in either order.
+- **Choose `expiration` deliberately**: users can linger on a hosted page, so
+  handle an expired intention gracefully.
+- **Don't log full checkout URLs**: they carry the `client_secret`.
+
+> Confirm the exact return query-parameter names and the return-HMAC field list
+> against Paymob's "transaction response callback" documentation before
+> implementing.
+
+## 10. Reference
 
 - Demo backend: [`example/server/index.js`](../server/index.js) and its
   [`README`](../server/README.md).
